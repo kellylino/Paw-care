@@ -1,21 +1,20 @@
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { MongoClient } from 'mongodb';
 
 dotenv.config();
 
-const uri = process.env.MONGO_URI;
-
-const client = new MongoClient(uri);
-
-export async function connectToDatabase() {
+// Function to connect to the database
+async function connectToDatabase() {
   try {
-    await client.connect();
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log('Connected to MongoDB Atlas!');
-    return client.db('pawCareDb');
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
     throw error;
   }
 }
 
-export default { connectToDatabase };
+export { connectToDatabase };

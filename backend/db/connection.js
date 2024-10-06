@@ -17,4 +17,4 @@ async function connectToDatabase() {
   }
 }
 
-export { connectToDatabase };
+export default connectToDatabase;

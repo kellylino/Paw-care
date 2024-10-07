@@ -1,11 +1,10 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose')
 
 const ownerSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     address: { type: String },
-    feedback: { type: String },
-    user_id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -14,6 +13,5 @@ const ownerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Owner = mongoose.model('Owner', ownerSchema);
+module.exports = mongoose.model('Owner', ownerSchema);
 
-export default Owner;

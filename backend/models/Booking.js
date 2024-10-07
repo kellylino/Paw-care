@@ -1,13 +1,13 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose')
 
 const bookingSchema = new mongoose.Schema(
   {
-    owner_id: {
+    owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Owner',
       required: true,
     },
-    giver_id: {
+    giver: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Giver',
       required: true,
@@ -23,6 +23,5 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Booking = mongoose.model('Booking', bookingSchema);
+module.exports = mongoose.model('Booking', bookingSchema);
 
-export default Booking;

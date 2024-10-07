@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose')
 
 const giverSchema = new mongoose.Schema(
   {
@@ -7,9 +7,8 @@ const giverSchema = new mongoose.Schema(
     experience_year: { type: String },
     description: { type: String },
     address: { type: String },
-    feedback: { type: String },
     pets_type: { type: [String] }, // Array of pet types
-    user_id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -18,6 +17,5 @@ const giverSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Giver = mongoose.model('Giver', giverSchema);
+module.exports = mongoose.model('Giver', giverSchema);
 
-export default Giver;

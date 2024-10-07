@@ -1,17 +1,20 @@
+const config = require('./utils/config')
 const express = require('express')
 const app = express()
 const cors = require('cors')
 const registerRouter = require('./controllers/register')
-const userRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+const giverRouter = require('./controllers/giver')
+const ownerRouter = require('./controllers/owner')
+const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 mongoose.connect(config.MONGO_URI)
 
 app.use(cors())
 app.use(express.json())
-app.use(middleware.tokenExtractor)
 app.use('/api/register', registerRouter)
-app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/giver', giverRouter)
+app.use('/api/owner', ownerRouter)
 
 module.exports = app

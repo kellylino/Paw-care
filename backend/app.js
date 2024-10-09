@@ -6,7 +6,7 @@ const registerRouter = require('./controllers/register')
 const loginRouter = require('./controllers/login')
 const giverRouter = require('./controllers/giver')
 const ownerRouter = require('./controllers/owner')
-const middleware = require('./utils/middleware')
+const petRouter = require('./controllers/pet')
 const mongoose = require('mongoose')
 mongoose.connect(config.MONGO_URI)
 
@@ -16,5 +16,6 @@ app.use('/api/register', registerRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/giver', giverRouter)
 app.use('/api/owner', ownerRouter)
+app.use('/api/pet', petRouter)
 
 module.exports = app

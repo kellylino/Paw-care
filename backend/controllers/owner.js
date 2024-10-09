@@ -9,7 +9,7 @@ ownerRouter.post('/', middleware.tokenExtractor, async (req, res) => {
         const newOwner = new Owner({
             name,
             address,
-            user_id: req.user_id, // Use user_id from token
+            user: req.user_id, // Use user_id from token
         });
 
         await newOwner.save();
@@ -37,6 +37,22 @@ ownerRouter.get('/:id', async (req, res) => {
 
     try {
         const owner = await Owner.findById(id).populate('user');
+        if (!owner) {
+            return res.status(404).json({ message: 'Owner not found.' });
+        }
+        res.status(200).json(owner);
+    } catch (error) {
+        console.error('Error fetching owner:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// READ: Get an owner by name
+ownerRouter.get('/:name', async (req, res) => {
+    const { name } = req.params;
+
+    try {
+        const owner = await Owner.findOne({ name: name }).populate('user');
         if (!owner) {
             return res.status(404).json({ message: 'Owner not found.' });
         }

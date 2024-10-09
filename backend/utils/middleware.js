@@ -1,13 +1,15 @@
 const jwt = require('jsonwebtoken');
 
 const tokenExtractor = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const authorization = req.headers['authorization'];
 
-  if (!token) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'No token provided.' });
   }
 
-  jwt.verify(token, 'JWT_SECRET', (err, decoded) => {
+  const token = authorization.split(' ')[1]; // Extract the token part
+
+  jwt.verify(token, process.env.JWT_SECRET , (err, decoded) => {
     if (err) {
       return res.status(500).json({ message: 'Failed to authenticate token.' });
     }

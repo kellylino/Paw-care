@@ -3,11 +3,11 @@ const registerRouter = require('express').Router()
 const User = require('../models/Users')
 
 registerRouter.post('/', async (req, res) => {
-    const { username, email, password, selectedRoles } = req.body;
+    const { username, email, password } = req.body;
 
     try {
         // Validate input
-        if (!username || !email || !password || !selectedRoles) {
+        if (!username || !email || !password ) {
             return res.status(400).json({ message: 'All fields are required.' });
         }
 
@@ -18,10 +18,10 @@ registerRouter.post('/', async (req, res) => {
         }
 
         // Validate roles
-        const invalidRoles = selectedRoles.filter(role => !['owner', 'giver'].includes(role));
-        if (invalidRoles.length > 0) {
-            return res.status(400).json({ message: `Invalid role(s): ${invalidRoles.join(', ')}` });
-        }
+        // const invalidRoles = selectedRoles.filter(role => !['owner', 'giver'].includes(role));
+        // if (invalidRoles.length > 0) {
+        //     return res.status(400).json({ message: `Invalid role(s): ${invalidRoles.join(', ')}` });
+        // }
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);

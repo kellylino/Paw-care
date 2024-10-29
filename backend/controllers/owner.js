@@ -23,7 +23,8 @@ ownerRouter.post('/', middleware.tokenExtractor, async (req, res) => {
 // READ: Get all owners
 ownerRouter.get('/', async (req, res) => {
     try {
-        const owners = await Owner.find().populate('user'); // Populate user details
+        const owners = await Owner.find();
+        //const owners = await Owner.find().populate('user'); // Populate user details
         res.status(200).json(owners);
     } catch (error) {
         console.error('Error fetching owners:', error);
@@ -36,7 +37,8 @@ ownerRouter.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const owner = await Owner.findById(id).populate('user');
+        const owner = await Owner.findById(id);
+        //const owner = await Owner.findById(id).populate('user');
         if (!owner) {
             return res.status(404).json({ message: 'Owner not found.' });
         }
@@ -52,7 +54,8 @@ ownerRouter.get('/:name', async (req, res) => {
     const { name } = req.params;
 
     try {
-        const owner = await Owner.findOne({ name: name }).populate('user');
+        const owner = await Owner.findOne({ name: name });
+        //const owner = await Owner.findOne({ name: name }).populate('user');
         if (!owner) {
             return res.status(404).json({ message: 'Owner not found.' });
         }
@@ -66,7 +69,7 @@ ownerRouter.get('/:name', async (req, res) => {
 // UPDATE: Update an owner
 ownerRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {
     const { id } = req.params;
-    const { name, address, feedback } = req.body;
+    const { name, address } = req.body;
 
     try {
         const owner = await Owner.findById(id);
@@ -76,7 +79,6 @@ ownerRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {
 
         if (name) owner.name = name;
         if (address) owner.address = address;
-        if (feedback) owner.feedback = feedback;
 
         await owner.save();
         res.status(200).json({ message: 'Owner updated successfully.', owner });

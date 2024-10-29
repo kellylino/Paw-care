@@ -5,19 +5,20 @@ const petRouter = require('express').Router()
 
 // CREATE: Add a new pet
 petRouter.post('/', middleware.tokenExtractor, async (req, res) => {
-    const { name, breed, photos, attention, age, gender, characteristic } = req.body;
+    const { name, breed, age, gender,  attention,  characteristic, image } = req.body;
 
     const owner = await Owner.findOne({ user: req.user_id }).select('_id');
+    console.log(owner)
 
     try {
         const newPet = new Pet({
             name,
             breed,
-            photos,
-            attention,
             age,
             gender,
+            attention,
             characteristic,
+            image,
             owner: owner
         });
 
@@ -25,6 +26,22 @@ petRouter.post('/', middleware.tokenExtractor, async (req, res) => {
         res.status(201).json({ message: 'Pet added successfully.', pet: newPet });
     } catch (error) {
         console.error('Error adding pet:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+// READ: Get all pets by owner
+petRouter.get('/owner', middleware.tokenExtractor, async (req, res) => {
+    try {
+        const owner = await Owner.findOne({ user: req.user_id }).select('_id');
+        if (!owner) {
+            return res.status(404).json({ message: 'Owner not found.' });
+        }
+
+        const pets = await Pet.find({ owner: owner._id }).populate('owner');
+        res.status(200).json(pets);
+    } catch (error) {
+        console.error('Error fetching pets for owner:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }
 });
@@ -77,8 +94,7 @@ petRouter.get('/:name', async (req, res) => {
 // UPDATE: Update a pet
 petRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {
     const { id } = req.params;
-    const { name, breed, photos, attention, age, gender, characteristic } = req.body;
-
+    const { name, breed, age, gender,  attention,  characteristic, image } = req.body;
     try {
         const pet = await Pet.findById(id);
         if (!pet) {
@@ -88,11 +104,12 @@ petRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {
         // Update only the fields provided
         if (name) pet.name = name;
         if (breed) pet.breed = breed;
-        if (photos) pet.photos = photos;
-        if (attention) pet.attention = attention;
         if (age) pet.age = age;
         if (gender) pet.gender = gender;
+        if (attention) pet.attention = attention;
         if (characteristic) pet.characteristic = characteristic;
+        if (image) pet.image = image;
+
 
         await pet.save();
         res.status(200).json({ message: 'Pet updated successfully.', pet });

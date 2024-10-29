@@ -5,7 +5,7 @@ const giverRouter = require('express').Router()
 // CREATE: Add a new giver
 giverRouter.post('/', middleware.tokenExtractor, async (req, res) => {
     const { name, address, description, experience, pets_type, image } = req.body;
-    console.log('User ID:', req.user_id);
+    //console.log('User ID:', req.user_id);
     try {
         const newGiver = new Giver({
             name,

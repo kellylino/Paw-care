@@ -14,8 +14,8 @@ app.use(cors())
 app.use(express.json())
 app.use('/api/register', registerRouter)
 app.use('/api/login', loginRouter)
-app.use('/api/giver', giverRouter)
-app.use('/api/owner', ownerRouter)
-app.use('/api/pet', petRouter)
+app.use('/api/givers', giverRouter)
+app.use('/api/owners', ownerRouter)
+app.use('/api/pets', petRouter)
 
 module.exports = app

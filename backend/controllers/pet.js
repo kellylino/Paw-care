@@ -5,7 +5,7 @@ const petRouter = require('express').Router()
 
 // CREATE: Add a new pet
 petRouter.post('/', middleware.tokenExtractor, async (req, res) => {
-    const { name, breed, age, gender,  attention,  characteristic, image } = req.body;
+    const { name, breed, type, age, gender,  attention,  characteristic, image } = req.body;
 
     const owner = await Owner.findOne({ user: req.user_id }).select('_id');
     console.log(owner)
@@ -14,6 +14,7 @@ petRouter.post('/', middleware.tokenExtractor, async (req, res) => {
         const newPet = new Pet({
             name,
             breed,
+            type,
             age,
             gender,
             attention,
@@ -94,7 +95,7 @@ petRouter.get('/:name', async (req, res) => {
 // UPDATE: Update a pet
 petRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {
     const { id } = req.params;
-    const { name, breed, age, gender,  attention,  characteristic, image } = req.body;
+    const { name, breed, type, age, gender,  attention,  characteristic, image } = req.body;
     try {
         const pet = await Pet.findById(id);
         if (!pet) {
@@ -104,6 +105,7 @@ petRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {
         // Update only the fields provided
         if (name) pet.name = name;
         if (breed) pet.breed = breed;
+        if (type) pet.type = type;
         if (age) pet.age = age;
         if (gender) pet.gender = gender;
         if (attention) pet.attention = attention;

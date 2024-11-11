@@ -1,10 +1,10 @@
-import React from 'react';
+// LoginPage.js
+import React, { useState } from 'react';
 import { Button, TextField, Typography, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import logo from './assets/logo-no-background.png';
 
-const LoginPage = ({ onLogin }) => {
-  const navigate = useNavigate();
+const AuthPage = ({ onLogin, onSignUp }) => {
+  const [isLoginForm, setIsLoginForm] = useState(true);
 
   return (
     <Box
@@ -50,7 +50,6 @@ const LoginPage = ({ onLogin }) => {
           style={{
             width: '120px',
             marginBottom: '20px',
-            right: '0px',
           }}
         />
         <Typography
@@ -70,7 +69,7 @@ const LoginPage = ({ onLogin }) => {
         </Typography>
       </Box>
 
-      {/* Login Form */}
+      {/* Authentication Form */}
       <Box
         style={{
           position: 'absolute',
@@ -82,17 +81,26 @@ const LoginPage = ({ onLogin }) => {
           boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
           textAlign: 'center',
           top: '35%',
-          // marginTop: '100px',
-
-          zIndex: 1, // Ensures the login form appears above the video
+          zIndex: 1,
         }}
       >
         <Typography
           variant='h5'
-          style={{ fontWeight: 'bold', marginBottom: '20px' }}
+          style={{ fontWeight: 'bold', marginBottom: '10px' }}
         >
-          Login
+          {isLoginForm ? 'Login' : 'Sign Up'}
         </Typography>
+
+        {/* Form Fields */}
+        {!isLoginForm && (
+          <TextField
+            fullWidth
+            label='Username'
+            margin='normal'
+            variant='standard'
+            InputLabelProps={{ style: { color: '#BDBDBD' } }}
+          />
+        )}
         <TextField
           fullWidth
           label='Email'
@@ -108,46 +116,90 @@ const LoginPage = ({ onLogin }) => {
           variant='standard'
           InputLabelProps={{ style: { color: '#BDBDBD' } }}
         />
+
+        {/* Submit Button */}
         <Button
           fullWidth
           variant='contained'
-          style={{
+          sx={{
             backgroundColor: '#6C63FF',
             color: '#FFFFFF',
             marginTop: '20px',
             padding: '10px 0',
             fontWeight: 'bold',
+            transition: 'background-color 0.4s ease, color 0.4s ease',
+            textTransform: 'none',
+            fontSize: '1rem',
+            '&:hover': {
+              backgroundColor: '#EACFFE',
+              color: '#000000',
+            },
+            marginBottom: '5px',
           }}
-          onClick={onLogin}
+          onClick={isLoginForm ? onLogin : onSignUp}
         >
-          Login
+          {isLoginForm ? 'Login' : 'Sign Up'}
         </Button>
-        <Box display='flex' justifyContent='space-between' marginTop='10px'>
-          <Typography variant='body2'>
-            <a
-              href='#forgot-password'
-              style={{ color: '#6C63FF', textDecoration: 'none' }}
-            >
-              Forgot <span style={{ fontWeight: 'bold' }}>Password?</span>
-            </a>
-          </Typography>
-          <Typography variant='body2'>
-            <a
-              href='#signup'
-              style={{ color: '#6C63FF', textDecoration: 'none' }}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/signup');
-              }}
-            >
-              Don’t have an account?{' '}
-              <span style={{ fontWeight: 'bold' }}>Signup</span>
-            </a>
-          </Typography>
+
+        {/* Links to Switch Forms */}
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          marginTop='10px'
+          flexDirection={'column'}
+          gap='0.5rem'
+        >
+          {isLoginForm ? (
+            <>
+              <Typography variant='body2'>
+                <a
+                  href='#forgot-password'
+                  style={{
+                    color: '#6C63FF',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span style={{ color: '#9F9B9B' }}>Forgot </span>
+                  <span style={{ fontWeight: 'bold' }}>Password?</span>
+                </a>
+              </Typography>
+              <Typography variant='body2'>
+                <a
+                  href='#signup'
+                  style={{ color: '#6C63FF', textDecoration: 'none' }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsLoginForm(false);
+                  }}
+                >
+                  <span style={{ color: '#9F9B9B' }}>
+                    Don’t have an account?{' '}
+                  </span>
+                  <span style={{ fontWeight: 'bold' }}>Sign Up</span>
+                </a>
+              </Typography>
+            </>
+          ) : (
+            <Typography variant='body2' style={{ margin: '0 auto' }}>
+              <a
+                href='#login'
+                style={{ color: '#6C63FF', textDecoration: 'none' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsLoginForm(true);
+                }}
+              >
+                <span style={{ color: '#9F9B9B' }}>
+                  Already have an account?{' '}
+                </span>
+                <span style={{ fontWeight: 'bold' }}>Login</span>
+              </a>
+            </Typography>
+          )}
         </Box>
       </Box>
     </Box>
   );
 };
 
-export default LoginPage;
+export default AuthPage;

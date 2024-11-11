@@ -5,16 +5,12 @@ import {
   Routes,
   useNavigate,
 } from 'react-router-dom';
-import { Box } from '@mui/material';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import PetOwnerForm from './PetOwnerForm';
 import WelcomePage from './WelcomePage';
 import CreateCaregiverProfile from './CreateCaregiverProfile';
 import SettingsPage from './SettingsPage';
-
-import backgroundImage from './assets/background.jpg'; // Ensure this path is correct
-// Ensure this path is correct
 import './App.css';
 
 function App() {

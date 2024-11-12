@@ -74,19 +74,19 @@ giverRouter.get('/:name', async (req, res) => {
 giverRouter.get('/search', async (req, res) => {
     try {
         // Destructure the query parameters from the request
-        const { location, petType, experienceLevel } = req.query;
+        const { address, petType, experience } = req.query;
 
         // Build a filter object based on available query parameters
         const filter = {};
 
-        if (location) {
-            filter.location = location;
+        if (address) {
+            filter.address = address;
         }
-        if (petType) {
-            filter.petType = petType; // Adjust to match the field name in the Giver schema
+        if (pets_type) {
+            filter.pets_type = pets_type; // Adjust to match the field name in the Giver schema
         }
-        if (experienceLevel) {
-            filter.experienceLevel = experienceLevel; // Adjust to match the field name in the Giver schema
+        if (experience) {
+            filter.experience = experience; // Adjust to match the field name in the Giver schema
         }
 
         // Perform the search with the filter

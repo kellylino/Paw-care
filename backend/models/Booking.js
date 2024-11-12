@@ -12,7 +12,6 @@ const bookingSchema = new mongoose.Schema(
       ref: 'Giver',
       required: true,
     },
-    date: { type: Date },
     start_time: { type: String },
     end_time: { type: String },
     status: {

@@ -70,6 +70,36 @@ giverRouter.get('/:name', async (req, res) => {
     }
 });
 
+// READ: Search a giver by location, prefer pet or experience level
+giverRouter.get('/search', async (req, res) => {
+    try {
+        // Destructure the query parameters from the request
+        const { location, petType, experienceLevel } = req.query;
+
+        // Build a filter object based on available query parameters
+        const filter = {};
+
+        if (location) {
+            filter.location = location;
+        }
+        if (petType) {
+            filter.petType = petType; // Adjust to match the field name in the Giver schema
+        }
+        if (experienceLevel) {
+            filter.experienceLevel = experienceLevel; // Adjust to match the field name in the Giver schema
+        }
+
+        // Perform the search with the filter
+        const givers = await Giver.find(filter)
+            .populate('user'); // Uncomment to populate user details if needed
+
+        res.status(200).json(givers);
+    } catch (error) {
+        console.error('Error fetching givers:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
 
 // UPDATE: Update a giver
 giverRouter.put('/:id', middleware.tokenExtractor, async (req, res) => {

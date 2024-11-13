@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
-import LoginPage from "./LoginPage";
-import SignUpPage from "./SignUpPage";
-import PetOwnerForm from "./PetOwnerForm";
-import WelcomePage from "./WelcomePage";
-import CreateCaregiverProfile from "./CreateCaregiverProfile";
-import SettingsPage from "./SettingsPage";
-import backgroundImage from "./assets/background.jpg"; // Ensure this path is correct
-import videoSource from "./assets/back.mp4"; // Ensure this path is correct
-import "./App.css";
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import LoginPage from './LoginPage';
+import SignUpPage from './SignUpPage';
+import PetOwnerForm from './PetOwnerForm';
+import WelcomePage from './WelcomePage';
+import CreateCaregiverProfile from './CreateCaregiverProfile';
+import SettingsPage from './SettingsPage';
+import MainInterface from './MainInterface';
+import PetOwnerDashboard from './PetOwnerDashboard'; // Import the new PetOwnerDashboard component
+import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState("#f8f8f8");
+  const [backgroundColor, setBackgroundColor] = useState('#f8f8f8');
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -34,14 +33,12 @@ function App() {
     <div
       className="app-container"
       style={{
-        backgroundImage: !isLoggedIn ? `url(${backgroundImage})` : "none",
         backgroundColor: backgroundColor,
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
       }}
     >
       <Routes>
@@ -50,16 +47,9 @@ function App() {
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/create-pet-owner-profile" element={<PetOwnerForm />} />
         <Route path="/create-caregiver-profile" element={<CreateCaregiverProfile />} />
-        <Route
-          path="/settings"
-          element={
-            <SettingsPage
-              onConfirmColorChange={handleConfirmColorChange}
-              currentColor={backgroundColor}
-              onCancel={handleCancel}
-            />
-          }
-        />
+        <Route path="/settings" element={<SettingsPage onConfirmColorChange={handleConfirmColorChange} currentColor={backgroundColor} onCancel={handleCancel} />} />
+        <Route path="/main-interface" element={<MainInterface />} /> {/* Route for MainInterface */}
+        <Route path="/pet-owner-dashboard" element={<PetOwnerDashboard />} /> {/* Route for PetOwnerDashboard */}
       </Routes>
     </div>
   );

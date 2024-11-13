@@ -73,7 +73,6 @@ giverRouter.get('/:name', async (req, res) => {
 // READ: Search a giver by location, prefer pet or experience level
 giverRouter.get('/search', async (req, res) => {
     try {
-        // Destructure the query parameters from the request
         const { address, petType, experience } = req.query;
 
         // Build a filter object based on available query parameters

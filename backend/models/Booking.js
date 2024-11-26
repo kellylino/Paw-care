@@ -12,8 +12,8 @@ const bookingSchema = new mongoose.Schema(
       ref: 'Giver',
       required: true,
     },
-    start_time: { type: String },
-    end_time: { type: String },
+    pet_name: { type: String },
+    date: { type: String },
     status: {
       type: String,
       enum: ['Pending', 'Confirmed', 'Completed', 'Canceled'],

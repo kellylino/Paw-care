@@ -31,7 +31,6 @@ registerRouter.post('/', async (req, res) => {
             username,
             email,
             password_hash: hashedPassword,
-            roles: selectedRoles,
         });
 
         await newUser.save();

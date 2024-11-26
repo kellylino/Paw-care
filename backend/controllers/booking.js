@@ -1,6 +1,6 @@
 const Booking = require('../models/Booking');
 const Owner = require('../models/Owner')
-const User = require('../models/User')
+const User = require('../models/Users')
 const middleware = require('../utils/middleware')
 const bookingRouter = require('express').Router()
 
@@ -37,10 +37,10 @@ bookingRouter.post('/owner', middleware.tokenExtractor, async (req, res) => {
     const {username, pet_name, date, status } = req.body;
 
     // find giver account user ID by username
-    const ownerUserID = await User.findOne({ username }).select('_id');
+    const giverUserID = await User.findOne({ username }).select('_id');
 
     // get the giver ID by user ID
-    const giver = await Owner.findOne({ user: ownerUserID }).select('_id');
+    const giver = await Owner.findOne({ user: giverUserID }).select('_id');
 
     // get the owner ID from token
     const owner = await Owner.findOne({ user: req.user_id }).select('_id');

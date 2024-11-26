@@ -10,9 +10,9 @@ function WelcomePage() {
 
   return (
     <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
+      display='flex'
+      flexDirection='column'
+      alignItems='center'
       style={{
         height: '100vh',
         width: '100vw',
@@ -21,24 +21,27 @@ function WelcomePage() {
       }}
     >
       <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        padding="20px 25px"
-        marginTop="40px"
+        display='flex'
+        alignItems='center'
+        justifyContent='space-between'
+        padding='20px 25px'
+        marginTop='40px'
         style={{
           width: '80%',
           backgroundColor: '#FFFFFF',
           boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)',
-          borderRadius:
-'10px',
+          borderRadius: '10px',
         }}
       >
-        <Box display="flex" alignItems="center" gap="10px">
-          <img src={logo} alt="Paw Care Logo" style={{ width: '120px', height: '50px' }} />
+        <Box display='flex' alignItems='center' gap='10px'>
+          <img
+            src={logo}
+            alt='Paw Care Logo'
+            style={{ width: '120px', height: '50px' }}
+          />
         </Box>
         <Button
-          color="primary"
+          color='primary'
           onClick={() => navigate('/')}
           style={{
             color: '#6C63FF',
@@ -52,7 +55,7 @@ function WelcomePage() {
       </Box>
 
       <Container
-        maxWidth="md"
+        maxWidth='md'
         style={{
           textAlign: 'center',
           marginTop: '100px',
@@ -61,7 +64,7 @@ function WelcomePage() {
         }}
       >
         <Typography
-          variant="h4"
+          variant='h4'
           gutterBottom
           style={{
             fontWeight: 'bold',
@@ -70,13 +73,17 @@ function WelcomePage() {
             marginBottom: '25px',
           }}
         >
-          WELCOME TO THE PAWTY, <span style={{ color: '#6C63FF' }}>USER_NAME</span>!
+          WELCOME TO THE PAWTY,{' '}
+          <span style={{ color: '#6C63FF' }}>USER_NAME</span>!
         </Typography>
-        <Typography variant="h6" style={{ fontFamily: 'RobotoSlab, serif', fontSize: '1.5rem' }}>
+        <Typography
+          variant='h6'
+          style={{ fontFamily: 'RobotoSlab, serif', fontSize: '1.5rem' }}
+        >
           Tell us a bit about yourself: Are you a pet owner or a caregiver?
         </Typography>
         <Typography
-          variant="h5"
+          variant='h5'
           style={{
             fontWeight: 'bold',
             marginTop: '40px',
@@ -88,9 +95,9 @@ function WelcomePage() {
         </Typography>
 
         {/* Profile Creation Buttons */}
-        <Box display="flex" justifyContent="center" gap="50px" marginTop="60px">
+        <Box display='flex' justifyContent='center' gap='50px' marginTop='60px'>
           <Button
-            variant="outlined"
+            variant='outlined'
             onClick={() => navigate('/create-pet-owner-profile')}
             sx={{
               backgroundColor: '#FFFFFF',
@@ -100,9 +107,13 @@ function WelcomePage() {
               fontWeight: 'bold',
               borderRadius: '10px',
               padding: '10px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               fontFamily: 'RobotoSlab, serif',
               fontSize: '1rem',
               textTransform: 'none',
+              transition: '0.3s',
               '&:hover': {
                 color: '#8F0CF0',
                 transform: 'scale(1.05)',
@@ -112,7 +123,7 @@ function WelcomePage() {
             Create pet owner profile
           </Button>
           <Button
-            variant="outlined"
+            variant='outlined'
             onClick={() => navigate('/create-caregiver-profile')}
             sx={{
               backgroundColor: '#FFFFFF',
@@ -122,7 +133,11 @@ function WelcomePage() {
               fontWeight: 'bold',
               borderRadius: '10px',
               padding: '10px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               fontFamily: 'RobotoSlab, serif',
+              transition: '0.3s',
               fontSize: '1rem',
               textTransform: 'none',
               '&:hover': {
@@ -135,12 +150,10 @@ function WelcomePage() {
           </Button>
         </Box>
       </Container>
-
-      {/* Bottom Image Section */}
       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="flex-end"
+        display='flex'
+        justifyContent='space-between'
+        alignItems='flex-end'
         style={{
           position: 'fixed',
           bottom: 0,
@@ -150,42 +163,27 @@ function WelcomePage() {
           fontSize: 0,
         }}
       >
-        <img src={welcomeImage} alt="welcome" style={{ width: '50%', marginLeft: '10px' }} />
-        <img src={welcomeImage2} alt="welcome" style={{ width: '50%' }} />
-      </Box>
-
-      {/* Navigation Buttons */}
-      <Box position="fixed" bottom="20px" left="20px" display="flex" gap="10px">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/main-interface')}
+        <img
+          src={welcomeImage}
+          alt='welcome'
           style={{
-            backgroundColor: '#6C63FF',
-            color: '#FFFFFF',
-            fontWeight: 'bold',
-            padding: '10px 20px',
-            borderRadius: '10px',
-            textTransform: 'none',
+            width: '50%',
+            margin: 0,
+            padding: 0,
+            display: 'block',
+            marginLeft: '10px',
           }}
-        >
-          Go to Main Interface
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => navigate('/pet-owner-dashboard')}
+        />
+        <img
+          src={welcomeImage2}
+          alt='welcome'
           style={{
-            backgroundColor: '#8C52FF',
-            color: '#FFFFFF',
-            fontWeight: 'bold',
-            padding: '10px 20px',
-            borderRadius: '10px',
-            textTransform: 'none',
+            width: '50%',
+            margin: 0,
+            padding: 0,
+            display: 'block',
           }}
-        >
-          Go to Pet Owner Dashboard
-        </Button>
+        />
       </Box>
     </Box>
   );

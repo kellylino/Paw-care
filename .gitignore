@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 
 .DS_Store  # macOS
-Thumbs.db  # Windows
+Tumbs.db  # Windows
 
 .vscode/
 .idea/

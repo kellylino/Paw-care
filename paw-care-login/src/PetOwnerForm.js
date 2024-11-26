@@ -1,5 +1,14 @@
-import React, { useState } from "react";
-import { TextField, Button, Typography, Box, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import React, { useState } from 'react';
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from '@mui/material';
 
 function PetOwnerForm() {
   const [open, setOpen] = useState(false);
@@ -14,59 +23,116 @@ function PetOwnerForm() {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-      bgcolor="#f3f3f3"
-      padding={4}
+      display='flex'
+      justifyContent='center'
+      alignItems='center'
+      height='100vh'
+      width='100vw'
+      sx={{
+        background: 'linear-gradient(to right, #EEEEEE 50%, #e8daff 50%)',
+      }}
+      padding={3}
     >
       <Box
-        display="flex"
-        width="700px"
-        bgcolor="#FFFFFF"
-        borderRadius="10px"
-        overflow="hidden"
-        boxShadow="0px 4px 12px rgba(0, 0, 0, 0.1)"
+        display='flex'
+        maxWidth='750px'
+        backgroundColor='#FFFFFF'
+        margin='0px 10px'
+        borderRadius='10px'
+        overflow='hidden'
+        boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'
       >
         {/* Left side text */}
         <Box
-          bgcolor="#e8daff"
-          width="40%"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          padding={3}
+          width='45%'
+          display='flex'
+          flexDirection='column'
+          justifyContent='center'
+          gap='0.7rem'
+          padding='30px 10px 30px 35px'
         >
-          <Typography variant="h6" style={{ fontWeight: "bold" }} gutterBottom>
+          <Typography
+            variant='h6'
+            style={{
+              fontFamily: 'RobotoSlab, serif',
+              fontWeight: 'bold',
+              fontSize: '1.3rem',
+            }}
+            gutterBottom
+          >
             Just a few words about you...
           </Typography>
-          <Typography variant="body2" style={{ fontWeight: "bold" }}>
+          <Typography
+            variant='body2'
+            style={{
+              fontFamily: 'RobotoSlab, serif',
+              fontSize: '1.1rem',
+            }}
+          >
             Don't worry, we really care more about your pet!
           </Typography>
         </Box>
 
         {/* Form Section */}
-        <Box width="60%" padding={4}>
-          <Typography variant="h5" gutterBottom>
+        <Box width='50%' padding={5}>
+          <Typography
+            variant='h5'
+            gutterBottom
+            style={{
+              fontWeight: 'bold',
+              fontFamily: 'RobotoSlab, serif',
+              fontSize: '1.4rem',
+            }}
+          >
             Create a profile
           </Typography>
           <TextField
             fullWidth
-            label="Owner Full Name"
-            variant="outlined"
-            margin="normal"
+            label='Owner Full Name'
+            variant='outlined'
+            margin='normal'
+            sx={{
+              '& .MuiInputBase-input': {
+                fontFamily: 'Roboto Slab, serif',
+              },
+              '& .MuiInputLabel-root': {
+                fontFamily: 'Roboto Slab, serif',
+              },
+            }}
           />
           <TextField
             fullWidth
-            label="Address"
-            variant="outlined"
-            margin="normal"
+            label='Address'
+            variant='outlined'
+            margin='normal'
+            sx={{
+              '& .MuiInputBase-input': {
+                fontFamily: 'Roboto Slab, serif',
+              },
+              '& .MuiInputLabel-root': {
+                fontFamily: 'Roboto Slab, serif',
+              },
+            }}
           />
-          <Box marginTop={4} textAlign="center">
-            <Button variant="contained" style={{ backgroundColor: "#6C63FF", color: "#FFFFFF" }} onClick={handleSave}>
-              SAVE
+          <Box marginTop={4} textAlign='center'>
+            <Button
+              variant='contained'
+              fullWidth
+              sx={{
+                backgroundColor: '#6C63FF',
+                color: '#FFFFFF',
+                textTransform: 'none',
+                fontSize: '1rem',
+                fontFamily: 'Roboto Slab, serif',
+                transition: 'background-color 0.4s ease, color 0.4s ease',
+                '&:hover': {
+                  backgroundColor: '#EACFFE',
+                  color: '#000000',
+                },
+              }}
+              onClick={handleSave}
+            >
+              Save
             </Button>
           </Box>
         </Box>
@@ -75,21 +141,54 @@ function PetOwnerForm() {
       {/* Popup Dialog */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
-          <Typography variant="h6" style={{ fontWeight: "bold" }}>
+          <Typography
+            variant='h6'
+            style={{
+              fontWeight: 'bold',
+              fontSize: '1.3rem',
+              fontFamily: 'Roboto Slab, serif',
+            }}
+          >
             Thanks for that!
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
-            But now, let’s get to the real star —your pet! <br />
+          <Typography
+            variant='body1'
+            style={{ fontFamily: 'Roboto Slab, serif', fontSize: '1.2rem' }}
+          >
+            But now, let’s get to the real star — your pet! <br />
             Would you like to tell us about it?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} style={{ color: "#6C63FF", fontWeight: "bold" }}>
+          <Button
+            onClick={handleClose}
+            sx={{
+              color: '#6C63FF',
+              fontWeight: 'bold',
+              fontFamily: 'Roboto Slab, serif',
+              backgroundColor: '#FFFFFF',
+              '&:hover': {
+                color: '#8F0CF0',
+              },
+            }}
+          >
             Yes, sure
           </Button>
-          <Button onClick={handleClose} style={{ color: "#BDBDBD", fontWeight: "bold" }}>
+          <Button
+            onClick={handleClose}
+            sx={{
+              color: '#BDBDBD',
+              fontWeight: 'bold',
+              fontFamily: 'Roboto Slab, serif',
+              marginRight: '10px',
+              backgroundColor: '#FFFFFF',
+              '&:hover': {
+                color: '#8F0CF0',
+              },
+            }}
+          >
             No, I am done
           </Button>
         </DialogActions>

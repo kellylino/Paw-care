@@ -8,6 +8,7 @@ const userRouter = require('./controllers/user')
 const giverRouter = require('./controllers/giver')
 const ownerRouter = require('./controllers/owner')
 const petRouter = require('./controllers/pet')
+const bookingRouter = require('./controllers/booking')
 const mongoose = require('mongoose')
 mongoose.connect(config.MONGO_URI)
 
@@ -19,5 +20,6 @@ app.use('/api/users', userRouter)
 app.use('/api/givers', giverRouter)
 app.use('/api/owners', ownerRouter)
 app.use('/api/pets', petRouter)
+app.use('/api/bookings', bookingRouter)
 
 module.exports = app

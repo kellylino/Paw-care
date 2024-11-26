@@ -14,6 +14,7 @@ const tokenExtractor = (req, res, next) => {
       return res.status(500).json({ message: 'Failed to authenticate token.' });
     }
     req.user_id = decoded.id; // user ID is stored in the token payload
+    req.username = decoded.username;
     next();
   });
 };

@@ -1,10 +1,31 @@
 const Giver = require('../models/Giver');
+const User = require('../models/Users')
 const middleware = require('../utils/middleware')
 const giverRouter = require('express').Router()
 
 // CREATE: Add a new giver
 giverRouter.post('/', middleware.tokenExtractor, async (req, res) => {
     const { name, address, description, experience, pets_type, image } = req.body;
+
+    const updatedUser = await User.findById(req.user_id);
+
+    if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Ensure roles is initialized as an array if it is null or undefined
+    if (!Array.isArray(updatedUser.roles)) {
+        updatedUser.roles = [];
+    }
+
+    // Add the role to the array if it's not already present
+    if (!updatedUser.roles.includes('giver')) {
+        updatedUser.roles.push('giver');
+    }
+
+    // Save the updated user document
+    await updatedUser.save();
+
     //console.log('User ID:', req.user_id);
     try {
         const newGiver = new Giver({

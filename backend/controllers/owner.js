@@ -1,24 +1,45 @@
 const Owner = require('../models/Owner');
+const User = require('../models/Users')
 const middleware = require('../utils/middleware')
 const ownerRouter = require('express').Router()
 
 ownerRouter.post('/', middleware.tokenExtractor, async (req, res) => {
-    const { name, address } = req.body;
-
     try {
+        const { name, address } = req.body;
+
+        const updatedUser = await User.findById(req.user_id);
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Ensure roles is initialized as an array if it is null or undefined
+        if (!Array.isArray(updatedUser.roles)) {
+            updatedUser.roles = [];
+        }
+
+        // Add the role to the array if it's not already present
+        if (!updatedUser.roles.includes('owner')) {
+            updatedUser.roles.push('owner');
+        }
+
+        // Save the updated user document
+        await updatedUser.save();
+
         const newOwner = new Owner({
             name,
             address,
-            user: req.user_id, // Use user_id from token
+            user: req.user_id,
         });
 
         await newOwner.save();
-        res.status(201).json({ message: 'Owner added successfully.', owner: newOwner });
+        return res.status(201).json({ message: 'Owner added successfully.', owner: newOwner });
     } catch (error) {
         console.error('Error adding owner:', error);
-        res.status(500).json({ message: 'Internal server error.' });
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 });
+
 
 // READ: Get all owners
 ownerRouter.get('/', async (req, res) => {

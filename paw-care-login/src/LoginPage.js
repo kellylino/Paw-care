@@ -1,24 +1,67 @@
-// LoginPage.js
 import React, { useState } from 'react';
 import { Button, TextField, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import logo from './assets/logo-no-background.png';
 
-const AuthPage = ({ onLogin, onSignUp }) => {
+const AuthPage = () => {
   const [isLoginForm, setIsLoginForm] = useState(true);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/api/login', {
+        email: email.trim(),
+        password: password.trim(),
+      });
+      console.log(response.data);
+      if (response.data.token && response.data.id) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userId', response.data.id);
+        localStorage.setItem('username', response.data.username);
+      }
+      navigate('/welcome');
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setErrorMessage('Invalid email or password. Please try again.');
+      } else {
+        setErrorMessage('Something went wrong. Please try again later.');
+      }
+      console.error(error);
+    }
+  };
+
+  const handleSignUp = async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/api/register', {
+        username: username.trim(),
+        email: email.trim(),
+        password: password.trim(),
+      });
+      console.log(response.data);
+      setIsLoginForm(true); // Switch to login form after successful registration
+    } catch (error) {
+      console.error(error);
+      setErrorMessage('Failed to register. Please try again.');
+    }
+  };
 
   return (
     <Box
-      display='flex'
-      alignItems='center'
-      justifyContent='center'
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
       style={{
         height: '100vh',
         overflow: 'hidden',
       }}
     >
-      {/* Video Background */}
       <video
-        src='/back.mp4'
+        src="/back.mp4"
         autoPlay
         loop
         muted
@@ -35,25 +78,24 @@ const AuthPage = ({ onLogin, onSignUp }) => {
         Your browser does not support the video tag.
       </video>
 
-      {/* Logo and Tagline */}
       <Box
-        position='absolute'
-        top='80px'
-        right='125px'
-        display='flex'
-        flexDirection='column'
-        alignItems='flex-end'
+        position="absolute"
+        top="80px"
+        right="125px"
+        display="flex"
+        flexDirection="column"
+        alignItems="flex-end"
       >
         <img
           src={logo}
-          alt='Paw Care Logo'
+          alt="Paw Care Logo"
           style={{
             width: '120px',
             marginBottom: '20px',
           }}
         />
         <Typography
-          variant='subtitle1'
+          variant="subtitle1"
           style={{
             color: '#000000',
             textAlign: 'right',
@@ -69,7 +111,6 @@ const AuthPage = ({ onLogin, onSignUp }) => {
         </Typography>
       </Box>
 
-      {/* Authentication Form */}
       <Box
         style={{
           position: 'absolute',
@@ -85,42 +126,52 @@ const AuthPage = ({ onLogin, onSignUp }) => {
         }}
       >
         <Typography
-          variant='h5'
+          variant="h5"
           style={{ fontWeight: 'bold', marginBottom: '10px' }}
         >
           {isLoginForm ? 'Login' : 'Sign Up'}
         </Typography>
 
-        {/* Form Fields */}
+        {errorMessage && (
+          <Typography color="error" variant="body2">
+            {errorMessage}
+          </Typography>
+        )}
+
         {!isLoginForm && (
           <TextField
             fullWidth
-            label='Username'
-            margin='normal'
-            variant='standard'
+            label="Username"
+            margin="normal"
+            variant="standard"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             InputLabelProps={{ style: { color: '#BDBDBD' } }}
           />
         )}
         <TextField
           fullWidth
-          label='Email'
-          margin='normal'
-          variant='standard'
+          label="Email"
+          margin="normal"
+          variant="standard"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           InputLabelProps={{ style: { color: '#BDBDBD' } }}
         />
         <TextField
           fullWidth
-          label='Password'
-          type='password'
-          margin='normal'
-          variant='standard'
+          label="Password"
+          type="password"
+          margin="normal"
+          variant="standard"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           InputLabelProps={{ style: { color: '#BDBDBD' } }}
         />
 
-        {/* Submit Button */}
         <Button
           fullWidth
-          variant='contained'
+          variant="contained"
           sx={{
             backgroundColor: '#6C63FF',
             color: '#FFFFFF',
@@ -136,62 +187,45 @@ const AuthPage = ({ onLogin, onSignUp }) => {
             },
             marginBottom: '5px',
           }}
-          onClick={isLoginForm ? onLogin : onSignUp}
+          onClick={isLoginForm ? handleLogin : handleSignUp}
         >
           {isLoginForm ? 'Login' : 'Sign Up'}
         </Button>
 
-        {/* Links to Switch Forms */}
         <Box
-          display='flex'
-          justifyContent='space-between'
-          marginTop='10px'
+          display="flex"
+          justifyContent="space-between"
+          marginTop="10px"
           flexDirection={'column'}
-          gap='0.5rem'
+          gap="0.5rem"
         >
           {isLoginForm ? (
             <>
-              <Typography variant='body2'>
+              <Typography variant="body2">
                 <a
-                  href='#forgot-password'
-                  style={{
-                    color: '#6C63FF',
-                    textDecoration: 'none',
-                  }}
-                >
-                  <span style={{ color: '#9F9B9B' }}>Forgot </span>
-                  <span style={{ fontWeight: 'bold' }}>Password?</span>
-                </a>
-              </Typography>
-              <Typography variant='body2'>
-                <a
-                  href='#signup'
+                  href="#signup"
                   style={{ color: '#6C63FF', textDecoration: 'none' }}
                   onClick={(e) => {
                     e.preventDefault();
                     setIsLoginForm(false);
                   }}
                 >
-                  <span style={{ color: '#9F9B9B' }}>
-                    Don’t have an account?{' '}
-                  </span>
+                  <span style={{ color: '#9F9B9B' }}>Don’t have an account?{' '}</span>
                   <span style={{ fontWeight: 'bold' }}>Sign Up</span>
                 </a>
               </Typography>
             </>
           ) : (
-            <Typography variant='body2' style={{ margin: '0 auto' }}>
+            <Typography variant="body2" style={{ margin: '0 auto' }}>
               <a
-                href='#login'
+                href="#login"
                 style={{ color: '#6C63FF', textDecoration: 'none' }}
                 onClick={(e) => {
                   e.preventDefault();
                   setIsLoginForm(true);
                 }}
               >
-                <span style={{ color: '#9F9B9B' }}>
-                  Already have an account?{' '}
-                </span>
+                <span style={{ color: '#9F9B9B' }}>Already have an account?{' '}</span>
                 <span style={{ fontWeight: 'bold' }}>Login</span>
               </a>
             </Typography>

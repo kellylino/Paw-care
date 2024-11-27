@@ -11,6 +11,7 @@ import PetOwnerForm from './PetOwnerForm';
 import WelcomePage from './WelcomePage';
 import CreateCaregiverProfile from './CreateCaregiverProfile';
 import SettingsPage from './SettingsPage';
+import PetOwnerDashboard from './PetOwnerDashboard';
 import './App.css';
 
 function App() {
@@ -41,7 +42,6 @@ function App() {
         width: '100vw',
         display: 'flex',
         flexDirection: 'column',
-        // alignItems: 'center',
         justifyContent: 'center',
       }}
     >
@@ -64,6 +64,7 @@ function App() {
             />
           }
         />
+        <Route path='/pet-owner-dashboard' element={<PetOwnerDashboard />} />
       </Routes>
     </div>
   );

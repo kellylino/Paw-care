@@ -1,12 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Typography, Box, Container } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import logo from './assets/logo-no-background.png';
 import welcomeImage from './assets/welcome.png';
 import welcomeImage2 from './assets/welcome-1.png';
 
 function WelcomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [username, setUsername] = useState('User');
+
+  useEffect(() => {
+    if (location.state && location.state.username) {
+      setUsername(location.state.username);
+    } else {
+      const storedUser = localStorage.getItem('username');
+      if (storedUser) {
+        setUsername(storedUser);
+      }
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (location.state && location.state.username) {
+      localStorage.setItem('username', location.state.username);
+    }
+  }, [location.state]);
 
   return (
     <Box
@@ -42,7 +61,10 @@ function WelcomePage() {
         </Box>
         <Button
           color='primary'
-          onClick={() => navigate('/')}
+          onClick={() => {
+            localStorage.removeItem('username');
+            navigate('/');
+          }}
           style={{
             color: '#6C63FF',
             fontWeight: 'bold',
@@ -74,7 +96,7 @@ function WelcomePage() {
           }}
         >
           WELCOME TO THE PAWTY,{' '}
-          <span style={{ color: '#6C63FF' }}>USER_NAME</span>!
+          <span style={{ color: '#6C63FF' }}>{username && username.toUpperCase()}</span>!
         </Typography>
         <Typography
           variant='h6'
@@ -185,6 +207,27 @@ function WelcomePage() {
           }}
         />
       </Box>
+      {/* 小按钮：切换到 PetOwnerDashboard 界面 */}
+      <Button
+        onClick={() => navigate('/pet-owner-dashboard')}
+        sx={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '20px',
+          backgroundColor: '#6C63FF',
+          color: '#FFFFFF',
+          borderRadius: '50%',
+          width: '50px',
+          height: '50px',
+          minWidth: '0',
+          boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)',
+          '&:hover': {
+            backgroundColor: '#8F0CF0',
+          },
+        }}
+      >
+        Go
+      </Button>
     </Box>
   );
 }

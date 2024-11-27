@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import imageCompression from 'browser-image-compression';
 import {
   TextField,
   Button,
@@ -8,49 +10,106 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Checkbox,
+  ListItemText,
 } from '@mui/material';
 
 function CreateCaregiverProfile() {
   const [petImage, setPetImage] = useState(null);
-  const [experienceLevel, setExperienceLevel] = useState('');
-  const [preferredPets, setPreferredPets] = useState('');
+  const [experience, setExperience] = useState('');
+  const [petsType, setPetsType] = useState([]);
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [description, setDescription] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPetImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 500,
+          useWebWorker: true,
+        };
+        const compressedFile = await imageCompression(file, options);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPetImage(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Image compression failed:', error);
+      }
     }
   };
 
+  const handleSaveProfile = async () => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    if (!userId || !token) {
+      setErrorMessage('User not logged in.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('address', address);
+      formData.append('description', description);
+      formData.append('experience', experience);
+      petsType.forEach((pet) => formData.append('pets_type', pet));
+      formData.append('user', userId); // Add userId to formData
+
+      if (petImage) {
+        const byteString = atob(petImage.split(',')[1]);
+        const mimeString = petImage.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
+        formData.append('image', blob, 'petImage.jpg');
+      }
+
+      // Debugging log to verify the values being sent
+      console.log('Name:', formData.get('name'));
+      console.log('Address:', formData.get('address'));
+      console.log('Description:', formData.get('description'));
+      console.log('Experience:', formData.get('experience'));
+      console.log('Pets Type:', formData.getAll('pets_type'));
+
+      const response = await axios.post('http://localhost:4000/api/givers', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log(response.data);
+      alert('Profile created successfully!'); // Add success feedback
+    } catch (error) {
+      console.error('Save profile error:', error);
+      if (error.response) {
+        setErrorMessage(`Failed to create profile: ${error.response.data.message}`);
+      } else {
+        setErrorMessage('Failed to create profile. Please try again.');
+      }
+    }
+  };
+
+  const handlePetsTypeChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPetsType(typeof value === 'string' ? value.split(',') : value);
+  };
+
   return (
-    <Box
-      display='flex'
-      justifyContent='center'
-      alignItems='center'
-      height='100vh'
-      width='100vw'
-      backgroundColor='#EEEEEE'
-      sx={{
-        background: 'linear-gradient(to right, #EEEEEE 50%, #F8F9CC 50%)',
-      }}
-    >
-      <Box
-        width='700px'
-        backgroundColor='#FFFFFF'
-        padding='30px'
-        borderRadius='10px'
-        boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'
-      >
-        <Box
-          display='flex'
-          justifyContent='space-between'
-          alignItems='flex-start'
-          mb={0.2}
-        >
+    <Box display='flex' justifyContent='center' alignItems='center' height='100vh' width='100vw' backgroundColor='#EEEEEE'>
+      <Box width='700px' backgroundColor='#FFFFFF' padding='30px' borderRadius='10px' boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'>
+        <Box display='flex' justifyContent='space-between' alignItems='flex-start' mb={0.2}>
           {/* Left Side */}
           <Box width='55%'>
             <Typography
@@ -80,6 +139,8 @@ function CreateCaregiverProfile() {
               label='Full Name'
               variant='outlined'
               margin='dense'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               sx={{
                 '& .MuiInputBase-input': {
                   fontFamily: 'Roboto Slab, serif',
@@ -164,6 +225,8 @@ function CreateCaregiverProfile() {
               label='Address'
               variant='outlined'
               margin='dense'
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               sx={{
                 mb: 3,
                 '& .MuiInputBase-input': {
@@ -176,11 +239,13 @@ function CreateCaregiverProfile() {
             />
             <TextField
               fullWidth
-              label='Bio'
+              label='Description'
               variant='outlined'
               margin='dense'
               multiline
               rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Share a little about your personality! What makes you a pet's best friend?"
               sx={{
                 mb: 2,
@@ -217,48 +282,23 @@ function CreateCaregiverProfile() {
             >
               <InputLabel>Experience level</InputLabel>
               <Select
-                value={experienceLevel}
-                onChange={(e) => setExperienceLevel(e.target.value)}
+                value={experience}
+                onChange={(e) => setExperience(e.target.value)}
                 label='Experience level'
               >
-                <MenuItem
-                  value='entry'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
+                <MenuItem value='entry' sx={{ fontFamily: 'Roboto Slab, serif' }}>
                   Entry (less than 1 year)
                 </MenuItem>
-                <MenuItem
-                  value='junior'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
+                <MenuItem value='junior' sx={{ fontFamily: 'Roboto Slab, serif' }}>
                   Junior (1-3 years)
                 </MenuItem>
-                <MenuItem
-                  value='mid-level'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
+                <MenuItem value='mid-level' sx={{ fontFamily: 'Roboto Slab, serif' }}>
                   Mid-Level (3-5 years)
                 </MenuItem>
-                <MenuItem
-                  value='senior'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
+                <MenuItem value='senior' sx={{ fontFamily: 'Roboto Slab, serif' }}>
                   Senior (5-10 years)
                 </MenuItem>
-                <MenuItem
-                  value='expert'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
+                <MenuItem value='expert' sx={{ fontFamily: 'Roboto Slab, serif' }}>
                   Expert (10+ years)
                 </MenuItem>
               </Select>
@@ -279,71 +319,24 @@ function CreateCaregiverProfile() {
             >
               <InputLabel>Preferred pets</InputLabel>
               <Select
-                value={preferredPets}
-                onChange={(e) => setPreferredPets(e.target.value)}
+                multiple
+                value={petsType}
+                onChange={handlePetsTypeChange}
+                renderValue={(selected) => selected.join(', ')}
                 label='Preferred pets'
               >
-                <MenuItem
-                  value='dog'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  Dog
-                </MenuItem>
-                <MenuItem
-                  value='cat'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  Cat
-                </MenuItem>
-                <MenuItem
-                  value='bird'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  Bird
-                </MenuItem>
-                <MenuItem
-                  value='rabbit'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  Rabbit
-                </MenuItem>
-                <MenuItem
-                  value='small-mammals'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  Small mammals (e.g., hamsters, guinea pigs)
-                </MenuItem>
-                <MenuItem
-                  value='exotic-pet'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  Exotic pet
-                </MenuItem>
-                <MenuItem
-                  value='no-preference'
-                  sx={{
-                    fontFamily: 'Roboto Slab, serif',
-                  }}
-                >
-                  No preference
-                </MenuItem>
+                {['Dog', 'Cat', 'Bird', 'Rabbit', 'Small mammals', 'Exotic pet', 'No preference'].map((pet) => (
+                  <MenuItem key={pet} value={pet} sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                    <Checkbox checked={petsType.indexOf(pet) > -1} />
+                    <ListItemText primary={pet} />
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <Box textAlign='center'>
               <Button
                 variant='contained'
+                onClick={handleSaveProfile}
                 sx={{
                   backgroundColor: '#6C63FF',
                   color: '#FFFFFF',
@@ -365,7 +358,11 @@ function CreateCaregiverProfile() {
           </Box>
         </Box>
 
-        {/* Save Button */}
+        {errorMessage && (
+          <Typography color='error' variant='body2' sx={{ marginTop: '20px' }}>
+            {errorMessage}
+          </Typography>
+        )}
       </Box>
     </Box>
   );

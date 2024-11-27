@@ -1,12 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, TextField, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const SignUpPage = ({ onSignUp }) => {
   const navigate = useNavigate();
-  const handleSignUp = () => {
-    onSignUp();
-    navigate('/');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignUp = async () => {
+    const requestBody = {
+      username: username,
+      email: email,
+      password: password,
+    };
+
+    try {
+      const response = await fetch("http://localhost:4000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        onSignUp();
+        navigate("/");
+      } else {
+        const errorData = await response.json();
+        console.error("Error: ", errorData);
+        // You can handle error display here (e.g., show an error message)
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      // You can handle error display here (e.g., show an error message)
+    }
   };
 
   return (
@@ -39,6 +68,8 @@ const SignUpPage = ({ onSignUp }) => {
           margin="normal"
           variant="standard"
           InputLabelProps={{ style: { color: "#BDBDBD" } }}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         <TextField
           fullWidth
@@ -46,6 +77,8 @@ const SignUpPage = ({ onSignUp }) => {
           margin="normal"
           variant="standard"
           InputLabelProps={{ style: { color: "#BDBDBD" } }}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           fullWidth
@@ -54,6 +87,8 @@ const SignUpPage = ({ onSignUp }) => {
           margin="normal"
           variant="standard"
           InputLabelProps={{ style: { color: "#BDBDBD" } }}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <Button
           fullWidth

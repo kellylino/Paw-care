@@ -1,8 +1,49 @@
-import React from 'react';
-import { Box, Button, Typography, IconButton } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, Typography, IconButton, Modal, TextField } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { format, addMonths, subMonths } from 'date-fns';
 
 function CalendarPage() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [events, setEvents] = useState({});
+  const [addEventOpen, setAddEventOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [newEvent, setNewEvent] = useState('');
+
+  const handleNextMonth = () => {
+    setCurrentDate(addMonths(currentDate, 1));
+  };
+
+  const handlePreviousMonth = () => {
+    setCurrentDate(subMonths(currentDate, 1));
+  };
+
+  const handleAddEvent = (date) => {
+    setSelectedDate(date);
+    setAddEventOpen(true);
+  };
+
+  const handleSaveEvent = () => {
+    setEvents((prevEvents) => ({
+      ...prevEvents,
+      [selectedDate]: [...(prevEvents[selectedDate] || []), newEvent],
+    }));
+    setAddEventOpen(false);
+    setNewEvent('');
+  };
+
+  const renderEvents = (date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    return (
+      events[formattedDate] &&
+      events[formattedDate].map((event, index) => (
+        <Box key={index} bgcolor="#FFD700" color="#000000" p={1} borderRadius={1} mt={1}>
+          {event}
+        </Box>
+      ))
+    );
+  };
+
   return (
     <Box
       position="fixed"
@@ -12,27 +53,26 @@ function CalendarPage() {
       height="100vh"
       bgcolor="background.paper"
       boxShadow={24}
-      p={4}
       display="flex"
       flexDirection="column"
-      justifyContent="center"
       alignItems="center"
+      overflow="hidden"
     >
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} width="100%">
-        <Typography variant="h6">November 2024</Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" width="90%" mt={2} mb={2}>
+        <Typography variant="h6">{format(currentDate, 'MMMM yyyy')}</Typography>
         <Box>
-          <Button variant="text" onClick={() => alert('Today button clicked')}>Today</Button>
-          <Button variant="text" onClick={() => alert('Back button clicked')}>Back</Button>
-          <Button variant="text" onClick={() => alert('Next button clicked')}>Next</Button>
+          <Button variant="text" onClick={() => setCurrentDate(new Date())}>Today</Button>
+          <Button variant="text" onClick={handlePreviousMonth}>Back</Button>
+          <Button variant="text" onClick={handleNextMonth}>Next</Button>
         </Box>
         <Box>
-          <Button variant="text" onClick={() => alert('Month view selected')}>Month</Button>
-          <Button variant="text" onClick={() => alert('Week view selected')}>Week</Button>
-          <Button variant="text" onClick={() => alert('Day view selected')}>Day</Button>
+          <Button variant="text">Month</Button>
+          <Button variant="text">Week</Button>
+          <Button variant="text">Day</Button>
         </Box>
       </Box>
-      <Box border="1px solid #CCCCCC" borderRadius="8px" p={2} width="80%" maxHeight="70vh" overflow="auto">
-        <table style={{ width: '100%', borderCollapse: 'collapse', height: 'auto' }}>
+      <Box border="1px solid #CCCCCC" borderRadius="8px" width="90%" height="75vh" overflow="auto">
+        <table style={{ width: '100%', borderCollapse: 'collapse', height: '100%' }}>
           <thead>
             <tr>
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
@@ -41,13 +81,18 @@ function CalendarPage() {
             </tr>
           </thead>
           <tbody>
-            {[0, 1, 2, 3, 4].map((weekIndex) => (
-              <tr key={weekIndex} style={{ height: '100px' }}>
+            {[...Array(5)].map((_, weekIndex) => (
+              <tr key={weekIndex} style={{ height: 'calc(75vh / 6)' }}>
                 {[...Array(7)].map((_, dayIndex) => {
-                  const date = weekIndex * 7 + dayIndex - 2;
+                  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+                  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+                  const date = weekIndex * 7 + dayIndex - firstDayOfMonth + 1;
+
+                  const currentCellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
+
                   return (
-                    <td key={dayIndex} style={{ padding: '20px', border: '1px solid #CCCCCC', textAlign: 'center', verticalAlign: 'top', width: '14.28%' }}>
-                      {date > 0 && date <= 30 && (
+                    <td key={dayIndex} style={{ padding: '10px', border: '1px solid #CCCCCC', textAlign: 'center', verticalAlign: 'top', width: '14.28%' }}>
+                      {date > 0 && date <= daysInMonth && (
                         <>
                           <Typography variant="body2" gutterBottom>{date}</Typography>
                           {(date === 12 || date === 13 || date === 14) && (
@@ -60,6 +105,15 @@ function CalendarPage() {
                               Kate Elliott - Pending
                             </Box>
                           )}
+                          {renderEvents(currentCellDate)}
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            style={{ marginTop: '10px' }}
+                            onClick={() => handleAddEvent(format(currentCellDate, 'yyyy-MM-dd'))}
+                          >
+                            Add Event
+                          </Button>
                         </>
                       )}
                     </td>
@@ -73,6 +127,34 @@ function CalendarPage() {
       <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => window.history.back()}>
         <Close />
       </IconButton>
+
+      {/* Add Event Modal */}
+      <Modal open={addEventOpen} onClose={() => setAddEventOpen(false)}>
+        <Box
+          position="fixed"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          width="300px"
+          bgcolor="background.paper"
+          p={4}
+          boxShadow={24}
+          borderRadius="10px"
+        >
+          <Typography variant="h6" mb={2}>Add Event for {selectedDate}</Typography>
+          <TextField
+            label="Event"
+            variant="outlined"
+            fullWidth
+            value={newEvent}
+            onChange={(e) => setNewEvent(e.target.value)}
+            margin="normal"
+          />
+          <Button variant="contained" color="primary" fullWidth onClick={handleSaveEvent}>
+            Save Event
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 }

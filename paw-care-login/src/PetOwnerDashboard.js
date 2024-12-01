@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Container, Card, CardContent, Avatar, TextField, MenuItem, IconButton, Modal, Menu } from '@mui/material';
 import { ArrowForwardIos, ArrowBackIos, Close, Notifications, Message, CalendarToday, Settings } from '@mui/icons-material';
-import petImage from './assets/pet-image.png';
+import petImage from './assets/pet-image.png'; // Replace with actual image path
 import logo from './assets/logo-no-background.png';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,8 +53,8 @@ function PetOwnerDashboard() {
         >
           <img src={logo} alt="Paw Care Logo" style={{ width: '120px', height: '50px' }} />
           <Box display="flex" alignItems="center" gap="15px">
-            <IconButton><Notifications /></IconButton>
-            <IconButton><Message /></IconButton>
+            <IconButton onClick={() => navigate('/notifications')}><Notifications /></IconButton>
+            <IconButton onClick={() => navigate('/messages')}><Message /></IconButton>
             <IconButton onClick={handleOpenCalendar}><CalendarToday /></IconButton>
             <IconButton onClick={handleMenuClick}><Settings /></IconButton>
             <Menu
@@ -67,7 +67,7 @@ function PetOwnerDashboard() {
               <MenuItem onClick={() => { handleMenuClose(); navigate('/edit-profile'); }}>Edit profile</MenuItem>
               <MenuItem onClick={() => { handleMenuClose(); navigate('/calendar'); }}>Calendar</MenuItem>
               <MenuItem onClick={() => { handleMenuClose(); navigate('/reviews'); }}>Reviews</MenuItem>
-              <MenuItem onClick={() => { handleMenuClose(); navigate('/logout'); }}>Log out</MenuItem>
+              <MenuItem onClick={() => { handleMenuClose(); navigate('/'); }}>Log out</MenuItem>
             </Menu>
           </Box>
         </Box>

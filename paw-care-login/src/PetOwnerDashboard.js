@@ -1,15 +1,40 @@
-import React from 'react';
-import { Box, Button, Typography, Container, Card, CardContent, Avatar, TextField, MenuItem, IconButton } from '@mui/material';
-import { ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
-import petImage from './assets/pet-image.png'; // Replace with actual image path
+import React, { useState } from 'react';
+import { Box, Button, Typography, Container, Card, CardContent, Avatar, TextField, MenuItem, IconButton, Modal, Menu } from '@mui/material';
+import { ArrowForwardIos, ArrowBackIos, Close, Notifications, Message, CalendarToday, Settings } from '@mui/icons-material';
+import petImage from './assets/pet-image.png';
 import logo from './assets/logo-no-background.png';
+import { useNavigate } from 'react-router-dom';
 
 function PetOwnerDashboard() {
+  const [selectedPet, setSelectedPet] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const navigate = useNavigate();
+
   const pets = [
-    { name: 'Snoopy', age: '1 year', gender: 'Male' },
-    { name: 'Snoopy', age: '1 year', gender: 'Male' },
-    { name: 'Snoopy', age: '1 year', gender: 'Male' },
+    { name: 'Kate Elliott', age: '1 year', gender: 'Female', experienceLevel: 'Junior', preferredPets: ['Dog', 'Cat', 'Bird'] },
   ];
+
+  const handleOpenProfile = (pet) => {
+    setSelectedPet(pet);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleMenuClick = (event) => {
+    setMenuAnchor(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
+  const handleOpenCalendar = () => {
+    navigate('/calendar');
+  };
 
   return (
     <Box style={{ backgroundColor: '#f3f3f3', minHeight: '100vh', padding: '20px' }}>
@@ -28,9 +53,22 @@ function PetOwnerDashboard() {
         >
           <img src={logo} alt="Paw Care Logo" style={{ width: '120px', height: '50px' }} />
           <Box display="flex" alignItems="center" gap="15px">
-            <IconButton><Avatar alt="Notifications">🔔</Avatar></IconButton>
-            <IconButton><Avatar alt="Messages">💬</Avatar></IconButton>
-            <Button>user_name</Button>
+            <IconButton><Notifications /></IconButton>
+            <IconButton><Message /></IconButton>
+            <IconButton onClick={handleOpenCalendar}><CalendarToday /></IconButton>
+            <IconButton onClick={handleMenuClick}><Settings /></IconButton>
+            <Menu
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor)}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem onClick={() => { handleMenuClose(); navigate('/edit-profile'); }}>Edit profile</MenuItem>
+              <MenuItem onClick={() => { handleMenuClose(); navigate('/calendar'); }}>Calendar</MenuItem>
+              <MenuItem onClick={() => { handleMenuClose(); navigate('/reviews'); }}>Reviews</MenuItem>
+              <MenuItem onClick={() => { handleMenuClose(); navigate('/logout'); }}>Log out</MenuItem>
+            </Menu>
           </Box>
         </Box>
       </Box>
@@ -73,7 +111,7 @@ function PetOwnerDashboard() {
                   <Typography variant="body1">Name: {pet.name}</Typography>
                   <Typography variant="body2">Age: {pet.age}</Typography>
                   <Typography variant="body2">Gender: {pet.gender}</Typography>
-                  <Button variant="contained" color="primary" style={{ marginTop: '10px' }}>View profile</Button>
+                  <Button variant="contained" color="primary" style={{ marginTop: '10px' }} onClick={() => handleOpenProfile(pet)}>View profile</Button>
                 </CardContent>
               </Card>
             ))}
@@ -82,37 +120,39 @@ function PetOwnerDashboard() {
         </Box>
       </Container>
 
-      {/* Upcoming Bookings and Recent Reviews */}
-      <Container maxWidth="lg">
-        <Box display="flex" gap="40px" mb={4}>
-          {/* Upcoming Bookings */}
-          <Box flex="1">
-            <Typography variant="h6" gutterBottom>Upcoming bookings</Typography>
-            <Card style={{ padding: '20px', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
-              <Box display="flex" alignItems="center" gap="15px">
-                <img src={petImage} alt="Pet" style={{ width: '80px', height: '80px', borderRadius: '10px' }} />
-                <Box>
-                  <Typography variant="body1">Pet: Lucky</Typography>
-                  <Typography variant="body2">Owner: John Smith</Typography>
-                  <Typography variant="body2">Date: 28.12.2024</Typography>
-                </Box>
-              </Box>
-              <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>Open calendar</Button>
-            </Card>
-          </Box>
-
-          {/* Recent Reviews */}
-          <Box flex="1">
-            <Typography variant="h6" gutterBottom>Recent reviews</Typography>
-            <Card style={{ padding: '20px', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
-              <Typography variant="body2" gutterBottom>"Lorem ipsum dolor sit amet, consectetur adipiscing elit..."</Typography>
-              <Typography variant="body2">Owner: Kelly White</Typography>
-              <Typography variant="body2">Pet: Kai</Typography>
-              <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>View all reviews</Button>
-            </Card>
-          </Box>
+      {/* Pet Profile Modal */}
+      <Modal open={open} onClose={handleClose}>
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          width="100vw"
+          height="100vh"
+          bgcolor="background.paper"
+          boxShadow={24}
+          p={4}
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={handleClose}>
+            <Close />
+          </IconButton>
+          {selectedPet && (
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <Avatar alt={selectedPet.name} src={petImage} style={{ width: '100px', height: '100px', marginBottom: '20px' }} />
+              <Typography variant="h5" gutterBottom>{selectedPet.name}</Typography>
+              <Typography variant="body1">Age: {selectedPet.age}</Typography>
+              <Typography variant="body1">Gender: {selectedPet.gender}</Typography>
+              <Typography variant="body1">Experience level: {selectedPet.experienceLevel}</Typography>
+              <Typography variant="body1" gutterBottom>Preferred pets: {selectedPet.preferredPets.join(', ')}</Typography>
+              <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>Send message</Button>
+              <Button variant="contained" color="primary" style={{ marginTop: '10px' }} onClick={handleOpenCalendar}>Check calendar</Button>
+            </Box>
+          )}
         </Box>
-      </Container>
+      </Modal>
     </Box>
   );
 }

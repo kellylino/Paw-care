@@ -12,12 +12,14 @@ import WelcomePage from './WelcomePage';
 import CreateCaregiverProfile from './CreateCaregiverProfile';
 import SettingsPage from './SettingsPage';
 import PetOwnerDashboard from './PetOwnerDashboard';
+import CalendarPage from './CalendarPage';
 import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f8f8f8');
   const navigate = useNavigate();
+
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -65,6 +67,7 @@ function App() {
           }
         />
         <Route path='/pet-owner-dashboard' element={<PetOwnerDashboard />} />
+        <Route path='/calendar' element={<CalendarPage />} /> {/* Add the route for CalendarPage */}
       </Routes>
     </div>
   );

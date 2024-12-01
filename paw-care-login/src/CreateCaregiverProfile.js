@@ -13,8 +13,10 @@ import {
   Checkbox,
   ListItemText,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function CreateCaregiverProfile() {
+  const navigate = useNavigate();
   const [petImage, setPetImage] = useState(null);
   const [experience, setExperience] = useState('');
   const [petsType, setPetsType] = useState([]);
@@ -89,6 +91,7 @@ function CreateCaregiverProfile() {
       });
       console.log(response.data);
       alert('Profile created successfully!'); // Add success feedback
+      navigate('/caregiver_dashboard'); // Navigate to caregiver_dashboard on success
     } catch (error) {
       console.error('Save profile error:', error);
       if (error.response) {

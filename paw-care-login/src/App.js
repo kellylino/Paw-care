@@ -13,13 +13,13 @@ import CreateCaregiverProfile from './CreateCaregiverProfile';
 import SettingsPage from './SettingsPage';
 import PetOwnerDashboard from './PetOwnerDashboard';
 import CalendarPage from './CalendarPage';
+import CaregiverDashboard from './caregiver_dashboard';
 import './App.css';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f8f8f8');
   const navigate = useNavigate();
-
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -52,10 +52,7 @@ function App() {
         <Route path='/signup' element={<SignUpPage onSignUp={() => {}} />} />
         <Route path='/welcome' element={<WelcomePage />} />
         <Route path='/create-pet-owner-profile' element={<PetOwnerForm />} />
-        <Route
-          path='/create-caregiver-profile'
-          element={<CreateCaregiverProfile />}
-        />
+        <Route path='/create-caregiver-profile' element={<CreateCaregiverProfile />} />
         <Route
           path='/settings'
           element={
@@ -67,7 +64,8 @@ function App() {
           }
         />
         <Route path='/pet-owner-dashboard' element={<PetOwnerDashboard />} />
-        <Route path='/calendar' element={<CalendarPage />} /> {/* Add the route for CalendarPage */}
+        <Route path='/calendar' element={<CalendarPage />} />
+        <Route path='/caregiver_dashboard' element={<CaregiverDashboard />} /> {/* 添加对 CaregiverDashboard 的路由 */}
       </Routes>
     </div>
   );

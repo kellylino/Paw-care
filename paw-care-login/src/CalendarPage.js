@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, IconButton, Modal, TextField } from '@mui/material';
+import { Box, Button, Typography, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { format, addMonths, subMonths } from 'date-fns';
 
 function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState({});
-  const [addEventOpen, setAddEventOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [newEvent, setNewEvent] = useState('');
 
   const handleNextMonth = () => {
     setCurrentDate(addMonths(currentDate, 1));
@@ -16,20 +13,6 @@ function CalendarPage() {
 
   const handlePreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
-  };
-
-  const handleAddEvent = (date) => {
-    setSelectedDate(date);
-    setAddEventOpen(true);
-  };
-
-  const handleSaveEvent = () => {
-    setEvents((prevEvents) => ({
-      ...prevEvents,
-      [selectedDate]: [...(prevEvents[selectedDate] || []), newEvent],
-    }));
-    setAddEventOpen(false);
-    setNewEvent('');
   };
 
   const renderEvents = (date) => {
@@ -106,14 +89,6 @@ function CalendarPage() {
                             </Box>
                           )}
                           {renderEvents(currentCellDate)}
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            style={{ marginTop: '10px' }}
-                            onClick={() => handleAddEvent(format(currentCellDate, 'yyyy-MM-dd'))}
-                          >
-                            Add Event
-                          </Button>
                         </>
                       )}
                     </td>
@@ -127,34 +102,6 @@ function CalendarPage() {
       <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => window.history.back()}>
         <Close />
       </IconButton>
-
-      {/* Add Event Modal */}
-      <Modal open={addEventOpen} onClose={() => setAddEventOpen(false)}>
-        <Box
-          position="fixed"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          width="300px"
-          bgcolor="background.paper"
-          p={4}
-          boxShadow={24}
-          borderRadius="10px"
-        >
-          <Typography variant="h6" mb={2}>Add Event for {selectedDate}</Typography>
-          <TextField
-            label="Event"
-            variant="outlined"
-            fullWidth
-            value={newEvent}
-            onChange={(e) => setNewEvent(e.target.value)}
-            margin="normal"
-          />
-          <Button variant="contained" color="primary" fullWidth onClick={handleSaveEvent}>
-            Save Event
-          </Button>
-        </Box>
-      </Modal>
     </Box>
   );
 }

@@ -9,6 +9,8 @@ function PetOwnerDashboard() {
   const [selectedPet, setSelectedPet] = useState(null);
   const [open, setOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const pets = [
@@ -34,6 +36,21 @@ function PetOwnerDashboard() {
 
   const handleOpenCalendar = () => {
     navigate('/calendar');
+  };
+
+  const handleSendMessage = () => {
+    setMessageOpen(true);
+  };
+
+  const handleCloseMessage = () => {
+    setMessageOpen(false);
+    setMessage('');
+  };
+
+  const handleSend = () => {
+    console.log(`Message to ${selectedPet.name}: ${message}`);
+    setMessageOpen(false);
+    setMessage('');
   };
 
   return (
@@ -147,10 +164,40 @@ function PetOwnerDashboard() {
               <Typography variant="body1">Gender: {selectedPet.gender}</Typography>
               <Typography variant="body1">Experience level: {selectedPet.experienceLevel}</Typography>
               <Typography variant="body1" gutterBottom>Preferred pets: {selectedPet.preferredPets.join(', ')}</Typography>
-              <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>Send message</Button>
+              <Button variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={handleSendMessage}>Send message</Button>
               <Button variant="contained" color="primary" style={{ marginTop: '10px' }} onClick={handleOpenCalendar}>Check calendar</Button>
             </Box>
           )}
+        </Box>
+      </Modal>
+
+      {/* Send Message Modal */}
+      <Modal open={messageOpen} onClose={handleCloseMessage}>
+        <Box
+          position="fixed"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          width="400px"
+          bgcolor="background.paper"
+          p={4}
+          boxShadow={24}
+          borderRadius="10px"
+        >
+          <Typography variant="h6" mb={2}>Send Message to {selectedPet?.name}</Typography>
+          <TextField
+            label="Message"
+            variant="outlined"
+            fullWidth
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            margin="normal"
+            multiline
+            rows={4}
+          />
+          <Button variant="contained" color="primary" fullWidth onClick={handleSend}>
+            Send
+          </Button>
         </Box>
       </Modal>
     </Box>

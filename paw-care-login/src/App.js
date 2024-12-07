@@ -14,6 +14,8 @@ import SettingsPage from './SettingsPage';
 import PetOwnerDashboard from './PetOwnerDashboard';
 import CalendarPage from './CalendarPage';
 import CaregiverDashboard from './caregiver_dashboard';
+import PetProfileForm from './PetProfileForm';
+import PetProfilePage from './PetProfilePage';
 import './App.css';
 
 function App() {
@@ -40,7 +42,7 @@ function App() {
       className='app-container'
       style={{
         backgroundColor: backgroundColor,
-        height: '100vh',
+        minHeight: '100vh',
         width: '100vw',
         display: 'flex',
         flexDirection: 'column',
@@ -52,7 +54,10 @@ function App() {
         <Route path='/signup' element={<SignUpPage onSignUp={() => {}} />} />
         <Route path='/welcome' element={<WelcomePage />} />
         <Route path='/create-pet-owner-profile' element={<PetOwnerForm />} />
-        <Route path='/create-caregiver-profile' element={<CreateCaregiverProfile />} />
+        <Route
+          path='/create-caregiver-profile'
+          element={<CreateCaregiverProfile />}
+        />
         <Route
           path='/settings'
           element={
@@ -65,7 +70,12 @@ function App() {
         />
         <Route path='/pet-owner-dashboard' element={<PetOwnerDashboard />} />
         <Route path='/calendar' element={<CalendarPage />} />
-        <Route path='/caregiver_dashboard' element={<CaregiverDashboard />} /> {/* 添加对 CaregiverDashboard 的路由 */}
+        <Route
+          path='/caregiver_dashboard'
+          element={<CaregiverDashboard />}
+        />{' '}
+        <Route path='/create-pet-profile' element={<PetProfileForm />} />
+        <Route path='/pet-profile-page' element={<PetProfilePage />} />
       </Routes>
     </div>
   );

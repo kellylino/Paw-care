@@ -55,15 +55,27 @@ function CreateCaregiverProfile() {
       return;
     }
 
+    // Check if all required fields are filled
+    if (!name.trim() || !address.trim() || !description.trim()) {
+      setErrorMessage('All fields are required.');
+      return;
+    }
+
     try {
+      // Create a new FormData instance
       const formData = new FormData();
+
+      // Append the form data with proper keys and values
       formData.append('name', name);
       formData.append('address', address);
       formData.append('description', description);
       formData.append('experience', experience);
-      petsType.forEach((pet) => formData.append('pets_type', pet));
+      if (petsType && petsType.length > 0) {
+        petsType.forEach((pet) => formData.append('pets_type', pet));
+      }
       formData.append('user', userId); // Add userId to formData
 
+      // Check and append pet image if provided
       if (petImage) {
         const byteString = atob(petImage.split(',')[1]);
         const mimeString = petImage.split(',')[0].split(':')[1].split(';')[0];
@@ -76,26 +88,40 @@ function CreateCaregiverProfile() {
         formData.append('image', blob, 'petImage.jpg');
       }
 
-      // Debugging log to verify the values being sent
-      console.log('Name:', formData.get('name'));
-      console.log('Address:', formData.get('address'));
-      console.log('Description:', formData.get('description'));
-      console.log('Experience:', formData.get('experience'));
-      console.log('Pets Type:', formData.getAll('pets_type'));
+      // Log all form data to verify its contents before sending
+      for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+      }
 
-      const response = await axios.post('http://localhost:4000/api/givers', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log(response.data);
-      alert('Profile created successfully!'); // Add success feedback
-      navigate('/caregiver_dashboard'); // Navigate to caregiver_dashboard on success
+      console.log('Sending formData to server...');
+
+      const response = await axios.post(
+        'http://localhost:4000/api/givers',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        console.log('Profile created successfully!');
+        console.log('Navigating to caregiver_dashboard...');
+        navigate('/caregiver_dashboard');
+      } else {
+        setErrorMessage(
+          'Unexpected response status, could not create profile.'
+        );
+      }
     } catch (error) {
       console.error('Save profile error:', error);
       if (error.response) {
-        setErrorMessage(`Failed to create profile: ${error.response.data.message}`);
+        console.error('Error response data:', error.response.data);
+        setErrorMessage(
+          `Failed to create profile: ${error.response.data.message}`
+        );
       } else {
         setErrorMessage('Failed to create profile. Please try again.');
       }
@@ -110,9 +136,27 @@ function CreateCaregiverProfile() {
   };
 
   return (
-    <Box display='flex' justifyContent='center' alignItems='center' height='100vh' width='100vw' backgroundColor='#EEEEEE'>
-      <Box width='700px' backgroundColor='#FFFFFF' padding='30px' borderRadius='10px' boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'>
-        <Box display='flex' justifyContent='space-between' alignItems='flex-start' mb={0.2}>
+    <Box
+      display='flex'
+      justifyContent='center'
+      alignItems='center'
+      height='100vh'
+      width='100vw'
+      backgroundColor='#EEEEEE'
+    >
+      <Box
+        width='700px'
+        backgroundColor='#FFFFFF'
+        padding='30px'
+        borderRadius='10px'
+        boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'
+      >
+        <Box
+          display='flex'
+          justifyContent='space-between'
+          alignItems='flex-start'
+          mb={0.2}
+        >
           {/* Left Side */}
           <Box width='55%'>
             <Typography
@@ -192,7 +236,7 @@ function CreateCaregiverProfile() {
                   variant='body2'
                   color='textSecondary'
                   style={{
-                    fontFamily: 'RobotoSlab, serif',
+                    fontFamily: 'Roboto Slab, serif',
                     fontSize: '1rem',
                     color: '#969597',
                   }}
@@ -205,7 +249,7 @@ function CreateCaregiverProfile() {
               variant='contained'
               component='label'
               style={{
-                fontFamily: 'RobotoSlab, serif',
+                fontFamily: 'Roboto Slab, serif',
                 fontSize: '0.9rem',
                 textTransform: 'none',
                 marginBottom: '30px',
@@ -220,7 +264,7 @@ function CreateCaregiverProfile() {
           </Box>
         </Box>
 
-        {/* Row 2: Address and Bio */}
+        {/* Rest of the Form */}
         <Box display='flex' justifyContent='space-between'>
           <Box width='55%'>
             <TextField
@@ -289,19 +333,34 @@ function CreateCaregiverProfile() {
                 onChange={(e) => setExperience(e.target.value)}
                 label='Experience level'
               >
-                <MenuItem value='entry' sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                <MenuItem
+                  value='entry'
+                  sx={{ fontFamily: 'Roboto Slab, serif' }}
+                >
                   Entry (less than 1 year)
                 </MenuItem>
-                <MenuItem value='junior' sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                <MenuItem
+                  value='junior'
+                  sx={{ fontFamily: 'Roboto Slab, serif' }}
+                >
                   Junior (1-3 years)
                 </MenuItem>
-                <MenuItem value='mid-level' sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                <MenuItem
+                  value='mid-level'
+                  sx={{ fontFamily: 'Roboto Slab, serif' }}
+                >
                   Mid-Level (3-5 years)
                 </MenuItem>
-                <MenuItem value='senior' sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                <MenuItem
+                  value='senior'
+                  sx={{ fontFamily: 'Roboto Slab, serif' }}
+                >
                   Senior (5-10 years)
                 </MenuItem>
-                <MenuItem value='expert' sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                <MenuItem
+                  value='expert'
+                  sx={{ fontFamily: 'Roboto Slab, serif' }}
+                >
                   Expert (10+ years)
                 </MenuItem>
               </Select>
@@ -328,8 +387,20 @@ function CreateCaregiverProfile() {
                 renderValue={(selected) => selected.join(', ')}
                 label='Preferred pets'
               >
-                {['Dog', 'Cat', 'Bird', 'Rabbit', 'Small mammals', 'Exotic pet', 'No preference'].map((pet) => (
-                  <MenuItem key={pet} value={pet} sx={{ fontFamily: 'Roboto Slab, serif' }}>
+                {[
+                  'Dog',
+                  'Cat',
+                  'Bird',
+                  'Rabbit',
+                  'Small mammals',
+                  'Exotic pet',
+                  'No preference',
+                ].map((pet) => (
+                  <MenuItem
+                    key={pet}
+                    value={pet}
+                    sx={{ fontFamily: 'Roboto Slab, serif' }}
+                  >
                     <Checkbox checked={petsType.indexOf(pet) > -1} />
                     <ListItemText primary={pet} />
                   </MenuItem>

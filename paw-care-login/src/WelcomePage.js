@@ -63,6 +63,9 @@ function WelcomePage() {
           color='primary'
           onClick={() => {
             localStorage.removeItem('username');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userRole');
             navigate('/');
           }}
           style={{
@@ -96,7 +99,10 @@ function WelcomePage() {
           }}
         >
           WELCOME TO THE PAWTY,{' '}
-          <span style={{ color: '#6C63FF' }}>{username && username.toUpperCase()}</span>!
+          <span style={{ color: '#6C63FF' }}>
+            {username && username.toUpperCase()}
+          </span>
+          !
         </Typography>
         <Typography
           variant='h6'
@@ -207,27 +213,6 @@ function WelcomePage() {
           }}
         />
       </Box>
-      {/* 小按钮：切换到 PetOwnerDashboard 界面 */}
-      <Button
-        onClick={() => navigate('/pet-owner-dashboard')}
-        sx={{
-          position: 'fixed',
-          bottom: '20px',
-          left: '20px',
-          backgroundColor: '#6C63FF',
-          color: '#FFFFFF',
-          borderRadius: '50%',
-          width: '50px',
-          height: '50px',
-          minWidth: '0',
-          boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)',
-          '&:hover': {
-            backgroundColor: '#8F0CF0',
-          },
-        }}
-      >
-        Go
-      </Button>
     </Box>
   );
 }

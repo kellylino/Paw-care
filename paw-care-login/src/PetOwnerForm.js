@@ -9,16 +9,78 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function PetOwnerForm() {
   const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-  const handleSave = () => {
-    setOpen(true);
+  const handleSave = async () => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    if (!userId || !token) {
+      setErrorMessage('User not logged in.');
+      return;
+    }
+
+    // Ensure fields are filled before attempting to save
+    if (!name.trim()) {
+      setErrorMessage('Owner name is required.');
+      return;
+    }
+
+    if (!address.trim()) {
+      setErrorMessage('Address is required.');
+      return;
+    }
+
+    try {
+      // Save owner profile in the database and update user role
+      console.log('Saving owner profile...');
+      const response = await axios.post(
+        'http://localhost:4000/api/owners',
+        { name: name.trim(), address: address.trim() },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log('Owner profile response:', response);
+
+      // If the request is successful, open the dialog
+      setOpen(true);
+    } catch (error) {
+      console.error('Save profile error:', error);
+
+      if (error.response && error.response.data) {
+        console.log('Error response data:', error.response.data);
+        setErrorMessage(
+          `Failed to create profile: ${
+            error.response.data.message ||
+            'No specific error message from server.'
+          }`
+        );
+      } else {
+        setErrorMessage('Failed to create profile. Please try again.');
+      }
+    }
   };
 
   const handleClose = () => {
     setOpen(false);
+    navigate('/pet-owner-dashboard');
+  };
+
+  const handleCreatePetProfile = () => {
+    setOpen(false);
+    navigate('/create-pet-profile');
   };
 
   return (
@@ -42,7 +104,6 @@ function PetOwnerForm() {
         overflow='hidden'
         boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'
       >
-        {/* Left side text */}
         <Box
           width='45%'
           display='flex'
@@ -91,6 +152,8 @@ function PetOwnerForm() {
             label='Owner Full Name'
             variant='outlined'
             margin='normal'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             sx={{
               '& .MuiInputBase-input': {
                 fontFamily: 'Roboto Slab, serif',
@@ -105,6 +168,8 @@ function PetOwnerForm() {
             label='Address'
             variant='outlined'
             margin='normal'
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             sx={{
               '& .MuiInputBase-input': {
                 fontFamily: 'Roboto Slab, serif',
@@ -157,13 +222,12 @@ function PetOwnerForm() {
             variant='body1'
             style={{ fontFamily: 'Roboto Slab, serif', fontSize: '1.2rem' }}
           >
-            But now, let’s get to the real star — your pet! <br />
-            Would you like to tell us about it?
+            Would you like to create a profile for your pet now?
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={handleClose}
+            onClick={handleCreatePetProfile}
             sx={{
               color: '#6C63FF',
               fontWeight: 'bold',

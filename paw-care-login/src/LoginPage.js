@@ -18,13 +18,22 @@ const AuthPage = () => {
         email: email.trim(),
         password: password.trim(),
       });
-      console.log(response.data);
+
       if (response.data.token && response.data.id) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userId', response.data.id);
         localStorage.setItem('username', response.data.username);
+        localStorage.setItem('userRole', response.data.roles || '');
+
+        if (!response.data.roles || response.data.roles.length === 0) {
+          navigate('/welcome');
+        } else if (response.data.roles.includes('owner')) {
+          navigate('/pet-owner-dashboard');
+        } else if (response.data.roles.includes('giver')) {
+          navigate('/caregiver_dashboard');
+        }
+        console.log('Roles from server:', response.data.roles);
       }
-      navigate('/welcome');
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setErrorMessage('Invalid email or password. Please try again.');
@@ -52,16 +61,16 @@ const AuthPage = () => {
 
   return (
     <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
+      display='flex'
+      alignItems='center'
+      justifyContent='center'
       style={{
         height: '100vh',
         overflow: 'hidden',
       }}
     >
       <video
-        src="/back.mp4"
+        src='/back.mp4'
         autoPlay
         loop
         muted
@@ -79,23 +88,23 @@ const AuthPage = () => {
       </video>
 
       <Box
-        position="absolute"
-        top="80px"
-        right="125px"
-        display="flex"
-        flexDirection="column"
-        alignItems="flex-end"
+        position='absolute'
+        top='80px'
+        right='125px'
+        display='flex'
+        flexDirection='column'
+        alignItems='flex-end'
       >
         <img
           src={logo}
-          alt="Paw Care Logo"
+          alt='Paw Care Logo'
           style={{
             width: '120px',
             marginBottom: '20px',
           }}
         />
         <Typography
-          variant="subtitle1"
+          variant='subtitle1'
           style={{
             color: '#000000',
             textAlign: 'right',
@@ -126,14 +135,14 @@ const AuthPage = () => {
         }}
       >
         <Typography
-          variant="h5"
+          variant='h5'
           style={{ fontWeight: 'bold', marginBottom: '10px' }}
         >
           {isLoginForm ? 'Login' : 'Sign Up'}
         </Typography>
 
         {errorMessage && (
-          <Typography color="error" variant="body2">
+          <Typography color='error' variant='body2'>
             {errorMessage}
           </Typography>
         )}
@@ -141,9 +150,9 @@ const AuthPage = () => {
         {!isLoginForm && (
           <TextField
             fullWidth
-            label="Username"
-            margin="normal"
-            variant="standard"
+            label='Username'
+            margin='normal'
+            variant='standard'
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             InputLabelProps={{ style: { color: '#BDBDBD' } }}
@@ -151,19 +160,19 @@ const AuthPage = () => {
         )}
         <TextField
           fullWidth
-          label="Email"
-          margin="normal"
-          variant="standard"
+          label='Email'
+          margin='normal'
+          variant='standard'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           InputLabelProps={{ style: { color: '#BDBDBD' } }}
         />
         <TextField
           fullWidth
-          label="Password"
-          type="password"
-          margin="normal"
-          variant="standard"
+          label='Password'
+          type='password'
+          margin='normal'
+          variant='standard'
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           InputLabelProps={{ style: { color: '#BDBDBD' } }}
@@ -171,7 +180,7 @@ const AuthPage = () => {
 
         <Button
           fullWidth
-          variant="contained"
+          variant='contained'
           sx={{
             backgroundColor: '#6C63FF',
             color: '#FFFFFF',
@@ -193,39 +202,43 @@ const AuthPage = () => {
         </Button>
 
         <Box
-          display="flex"
-          justifyContent="space-between"
-          marginTop="10px"
+          display='flex'
+          justifyContent='space-between'
+          marginTop='10px'
           flexDirection={'column'}
-          gap="0.5rem"
+          gap='0.5rem'
         >
           {isLoginForm ? (
             <>
-              <Typography variant="body2">
+              <Typography variant='body2'>
                 <a
-                  href="#signup"
+                  href='#signup'
                   style={{ color: '#6C63FF', textDecoration: 'none' }}
                   onClick={(e) => {
                     e.preventDefault();
                     setIsLoginForm(false);
                   }}
                 >
-                  <span style={{ color: '#9F9B9B' }}>Don’t have an account?{' '}</span>
+                  <span style={{ color: '#9F9B9B' }}>
+                    Don’t have an account?{' '}
+                  </span>
                   <span style={{ fontWeight: 'bold' }}>Sign Up</span>
                 </a>
               </Typography>
             </>
           ) : (
-            <Typography variant="body2" style={{ margin: '0 auto' }}>
+            <Typography variant='body2' style={{ margin: '0 auto' }}>
               <a
-                href="#login"
+                href='#login'
                 style={{ color: '#6C63FF', textDecoration: 'none' }}
                 onClick={(e) => {
                   e.preventDefault();
                   setIsLoginForm(true);
                 }}
               >
-                <span style={{ color: '#9F9B9B' }}>Already have an account?{' '}</span>
+                <span style={{ color: '#9F9B9B' }}>
+                  Already have an account?{' '}
+                </span>
                 <span style={{ fontWeight: 'bold' }}>Login</span>
               </a>
             </Typography>

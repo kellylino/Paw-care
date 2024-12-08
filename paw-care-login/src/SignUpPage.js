@@ -26,20 +26,20 @@ const SignUpPage = ({ onSignUp }) => {
       });
 
       if (response.ok) {
-        // 用户注册成功，显示提示消息
+
         setSnackbarOpen(true);
-        // 等待 2 秒后导航到登录页面
+
         setTimeout(() => {
           navigate("/");
         }, 2000);
       } else {
         const errorData = await response.json();
         console.error("Error: ", errorData);
-        // 这里可以添加错误提示逻辑（例如显示错误消息）
+
       }
     } catch (error) {
       console.error("Error: ", error);
-      // 这里可以添加错误提示逻辑（例如显示错误消息）
+
     }
   };
 

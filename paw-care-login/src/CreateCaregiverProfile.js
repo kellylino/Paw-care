@@ -85,7 +85,7 @@ function CreateCaregiverProfile() {
           ia[i] = byteString.charCodeAt(i);
         }
         const blob = new Blob([ab], { type: mimeString });
-        formData.append('image', blob, 'petImage.jpg');
+        //formData.append('image', blob, 'petImage.jpg');
       }
 
       // Log all form data to verify its contents before sending

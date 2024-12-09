@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -38,9 +37,12 @@ function PetOwnerDashboard() {
   const [messageOpen, setMessageOpen] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  const [pets, setPets] = useState([]);
-  const [caregivers, setCaregivers] = useState([]);
 
+  const caregivers = [
+    { name: 'Kate Elliot', experience: 'Junior', rating: 5 },
+    { name: 'John Doe', experience: 'Mid-Level', rating: 4.5 },
+    { name: 'Emily Smith', experience: 'Senior', rating: 4.8 },
+  ];
   const cardStyle = {
     width: '250px',
     padding: '20px',
@@ -90,31 +92,6 @@ function PetOwnerDashboard() {
       setMenuAnchor(event.currentTarget);
     };
   };
-
-  useEffect(() => {
-    //Fetch pets
-    const token = localStorage.getItem('token');
-    axios
-      .get('http://localhost:4000/api/pets/owner', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setPets(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching pets:', error);
-      });
-
-    //Fetch caregivers
-    axios
-      .get('http://localhost:4000/api/givers')
-      .then((response) => {
-        setCaregivers(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching caregivers:', error);
-      });
-  }, []);
 
   const fontStyle = { fontFamily: 'Roboto Slab, serif' };
   const menuItemStyle = {
@@ -191,9 +168,7 @@ function PetOwnerDashboard() {
                 }}
                 onClick={() => {
                   handleMenuClose();
-                  if (pets.length > 0) {
-                    navigate(`/pet-profile-page/${pets[0]._id}`);
-                  }
+                  navigate('/pet-profile-page');
                 }}
               >
                 Profile
@@ -411,9 +386,9 @@ function PetOwnerDashboard() {
                 flexWrap: 'wrap',
               }}
             >
-              {caregivers.map((caregiver) => (
+              {caregivers.map((caregiver, index) => (
                 <Box
-                  key={caregiver._id}
+                  key={index}
                   sx={{
                     width: '270px',
                     padding: '20px',
@@ -429,7 +404,7 @@ function PetOwnerDashboard() {
                   {/* Avatar Section - Photo on the Left */}
                   <Avatar
                     alt={caregiver.name}
-                    src={caregiver.image || ''}
+                    src=''
                     style={{
                       width: '80px',
                       height: '80px',
@@ -462,23 +437,18 @@ function PetOwnerDashboard() {
                       fontSize='0.8rem'
                       style={{ fontFamily: 'fontStyle' }}
                     >
-                      Experience level:
-                      <br />
-                      {caregiver.experience}
+                      Experience level: {caregiver.experience}
                     </Typography>
 
                     {/* Star Rating Section */}
-                    {/* <Box display='flex' gap='5px'>
+                    <Box display='flex' gap='5px'>
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} style={{ color: '#FFD700' }} />
                       ))}
-                    </Box> */}
+                    </Box>
 
                     <Button
                       variant='contained'
-                      onClick={() =>
-                        navigate(`/giver-profile-page/${caregiver._id}`)
-                      }
                       sx={{
                         marginTop: '10px',
                         backgroundColor: '#6C63FF',
@@ -510,67 +480,111 @@ function PetOwnerDashboard() {
       </Box>
 
       {/* My Pet Section */}
-      <Box display='flex' justifyContent='center' gap='270px' flexWrap='wrap'>
-        {pets.map((pet) => (
-          <Box
-            key={pet._id}
-            sx={{
-              width: '310px',
-              display: 'flex',
-              flexDirection: 'row',
-              borderRadius: '10px',
-              gap: '25px',
-              bgcolor: '#FFFFFF',
-              padding: '20px',
-              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+      <Box display='flex' justifyContent='center' mb={4}>
+        <Box width='100%' maxWidth='1200px'>
+          <Typography
+            variant='h6'
+            gutterBottom
+            style={{
+              fontFamily: 'fontStyle',
+              fontWeight: 'bold',
+              marginLeft: '9.9rem',
+              marginBottom: '20px',
             }}
           >
-            <Box>
-              {pet.image ? (
+            My Pet
+          </Typography>
+          <Box
+            display='flex'
+            justifyContent='center'
+            gap='270px'
+            flexWrap='wrap'
+          >
+            <Box
+              sx={{
+                ...cardStyle,
+                width: '310px',
+                display: 'flex',
+                flexDirection: 'row',
+                borderRadius: '10px',
+                gap: '25px',
+              }}
+            >
+              <Box>
                 <img
-                  src={pet.image}
+                  src={advertisementImage}
                   alt='Pet'
                   style={{
                     width: '100%',
                     borderRadius: '10px',
+
                     objectFit: 'cover',
                   }}
                 />
-              ) : (
-                <Typography>No Image Available</Typography>
-              )}
+              </Box>
+              <Box style={{ paddingTop: '20px' }}>
+                <Typography
+                  variant='body1'
+                  style={{
+                    fontFamily: 'fontStyle',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Name: Danny
+                </Typography>
+                <Typography style={{ fontFamily: 'fontStyle' }} variant='body2'>
+                  Gender: Male
+                </Typography>
+                <Typography style={{ fontFamily: 'fontStyle' }} variant='body2'>
+                  Age: 3 years
+                </Typography>
+                <Button
+                  onClick={navigateToPetProfile}
+                  variant='contained'
+                  sx={{
+                    marginTop: '35px',
+                    fontFamily: 'fontStyle',
+                    fontSize: '0.9rem',
+                    whiteSpace: 'nowrap',
+                    textTransform: 'none',
+                    backgroundColor: '#6C63FF',
+                    transition: 'background-color 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: '#EACFFE',
+                      color: '#000000',
+                    },
+                  }}
+                >
+                  View profile
+                </Button>
+              </Box>
             </Box>
-            <Box style={{ paddingTop: '20px' }}>
+            <Box
+              // sx={cardStyle}
+              display='flex'
+              flexDirection='column'
+              justifyContent='center'
+              alignItems='center'
+            >
               <Typography
                 variant='body1'
+                gutterBottom
                 style={{
-                  fontFamily: 'Roboto Slab, serif',
-                  fontWeight: 'bold',
+                  fontFamily: 'fontStyle',
+                  fontSize: '1.3rem',
                   whiteSpace: 'nowrap',
+                  fontWeight: 'bold',
                 }}
               >
-                Name: {pet.name}
-              </Typography>
-              <Typography
-                style={{ fontFamily: 'Roboto Slab, serif' }}
-                variant='body2'
-              >
-                Gender: {pet.gender}
-              </Typography>
-              <Typography
-                style={{ fontFamily: 'Roboto Slab, serif' }}
-                variant='body2'
-              >
-                Age: {pet.age}
+                Would you like to add more pets?
               </Typography>
               <Button
-                onClick={() => navigate(`/pet-profile-page/${pet._id}`)}
-                variant='contained'
                 sx={{
-                  marginTop: '35px',
-                  fontFamily: 'Roboto Slab, serif',
+                  fontFamily: 'fontStyle',
                   fontSize: '0.9rem',
                   whiteSpace: 'nowrap',
+                  marginTop: '30px',
                   textTransform: 'none',
                   backgroundColor: '#6C63FF',
                   transition: 'background-color 0.3s ease',
@@ -579,49 +593,13 @@ function PetOwnerDashboard() {
                     color: '#000000',
                   },
                 }}
+                variant='contained'
+                onClick={() => navigate('/create-pet-profile')}
               >
-                View profile
+                Create profile
               </Button>
             </Box>
           </Box>
-        ))}
-        <Box
-          display='flex'
-          flexDirection='column'
-          justifyContent='center'
-          alignItems='center'
-        >
-          <Typography
-            variant='body1'
-            gutterBottom
-            style={{
-              fontFamily: 'Roboto Slab, serif',
-              fontSize: '1.3rem',
-              whiteSpace: 'nowrap',
-              fontWeight: 'bold',
-            }}
-          >
-            Would you like to add more pets?
-          </Typography>
-          <Button
-            sx={{
-              fontFamily: 'Roboto Slab, serif',
-              fontSize: '0.9rem',
-              whiteSpace: 'nowrap',
-              marginTop: '30px',
-              textTransform: 'none',
-              backgroundColor: '#6C63FF',
-              transition: 'background-color 0.3s ease',
-              '&:hover': {
-                backgroundColor: '#EACFFE',
-                color: '#000000',
-              },
-            }}
-            variant='contained'
-            onClick={() => navigate('/create-pet-profile')}
-          >
-            Create profile
-          </Button>
         </Box>
       </Box>
 
@@ -732,18 +710,18 @@ function PetOwnerDashboard() {
       </Modal>
       <Modal open={messageOpen} onClose={() => setMessageOpen(false)}>
         <Box
-          position='absolute'
-          top='50%'
-          left='50%'
-          transform='translate(-50%, -50%)'
-          bgcolor='background.paper'
+          position="absolute"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          bgcolor="background.paper"
           p={4}
-          borderRadius='10px'
+          borderRadius="10px"
           boxShadow={24}
         >
-          <Typography variant='h6'>Send a Message</Typography>
+          <Typography variant="h6">Send a Message</Typography>
           <TextField
-            label='Message'
+            label="Message"
             multiline
             rows={4}
             fullWidth
@@ -751,7 +729,7 @@ function PetOwnerDashboard() {
             onChange={(e) => setMessage(e.target.value)}
           />
           <Box mt={2}>
-            <Button variant='contained' onClick={handleSend} fullWidth>
+            <Button variant="contained" onClick={handleSend} fullWidth>
               Send
             </Button>
           </Box>

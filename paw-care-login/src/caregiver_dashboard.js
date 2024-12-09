@@ -3,33 +3,35 @@ import {
   Box,
   Button,
   Typography,
+  Avatar,
   TextField,
   MenuItem,
   IconButton,
-  Avatar,
   Modal,
+  Menu,
 } from '@mui/material';
 import {
   Notifications,
-  Message,
   CalendarToday,
   Settings,
+  Message,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CaregiverDashboard = () => {
   const navigate = useNavigate();
-  const [pets, setPets] = useState([]); // Pets data from the server
+  const [pets, setPets] = useState([]);
   const [location, setLocation] = useState('');
   const [petName, setPetName] = useState('');
   const [petType, setPetType] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [messageOpen, setMessageOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
-  const [selectedRecipient, setSelectedRecipient] = useState(null);
+  const [settingsAnchor, setSettingsAnchor] = useState(null);
+  const [messageOpen, setMessageOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedRecipient, setSelectedRecipient] = useState(null);
 
   const hardCodedUpcomingBookings = [
     {
@@ -60,7 +62,7 @@ const CaregiverDashboard = () => {
   ];
 
   useEffect(() => {
-    const fetchInitialPets = async () => {
+    const fetchPets = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/pets');
         setPets(response.data || []);
@@ -70,7 +72,7 @@ const CaregiverDashboard = () => {
       }
     };
 
-    fetchInitialPets();
+    fetchPets();
   }, []);
 
   const handleSearch = async () => {
@@ -82,24 +84,40 @@ const CaregiverDashboard = () => {
           type: petType,
         },
       });
-      setPets(
-        response.data.filter((pet) => {
-          const matchesLocation = location
-            ? pet.owner.address?.toLowerCase().includes(location.toLowerCase())
-            : true;
-          const matchesName = petName
-            ? pet.name?.toLowerCase().includes(petName.toLowerCase())
-            : true;
-          const matchesType = petType
-            ? pet.breed?.toLowerCase().includes(petType.toLowerCase())
-            : true;
-          return matchesLocation && matchesName && matchesType;
-        }) || []
-      );
+      const filteredPets = response.data.filter((pet) => {
+        const matchesLocation = location
+          ? pet.owner?.address?.toLowerCase().includes(location.toLowerCase())
+          : true;
+        const matchesName = petName
+          ? pet.name?.toLowerCase().includes(petName.toLowerCase())
+          : true;
+        const matchesType = petType
+          ? pet.breed?.toLowerCase().includes(petType.toLowerCase())
+          : true;
+        return matchesLocation && matchesName && matchesType;
+      });
+      setPets(filteredPets || []);
     } catch (error) {
-      console.error('Error fetching pets:', error);
-      setErrorMessage('Failed to fetch pets. Please try again later.');
+      console.error('Error searching pets:', error);
+      setErrorMessage('Failed to search pets. Please try again later.');
     }
+  };
+
+  const handleSettingsClick = (event) => {
+    setSettingsAnchor(event.currentTarget);
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsAnchor(null);
+  };
+
+  const handleProfileClick = () => {
+    setProfileOpen(true);
+    setSettingsAnchor(null);
+  };
+
+  const handleLogoutClick = () => {
+    window.location.href = 'http://localhost:3000/';
   };
 
   const handleViewProfile = (pet) => {
@@ -128,7 +146,7 @@ const CaregiverDashboard = () => {
     setMessage('');
   };
 
-  const handleOpenCalendar = (booking) => {
+  const handleViewCalendar = (booking) => {
     console.log(`Opening calendar for booking on ${booking.date}`);
     navigate('/calendar', { state: { booking } });
   };
@@ -159,21 +177,29 @@ const CaregiverDashboard = () => {
         >
           <Typography variant="h6">Paw Care Dashboard</Typography>
           <Box display="flex" alignItems="center" gap="10px">
-            <IconButton onClick={() => navigate('/notifications')}>
-              <Notifications />
-            </IconButton>
             <IconButton onClick={() => handleSendMessage('Admin')}>
               <Message />
             </IconButton>
             <IconButton onClick={() => navigate('/calendar')}>
               <CalendarToday />
             </IconButton>
-            <IconButton onClick={() => navigate('/settings')}>
+            <IconButton onClick={handleSettingsClick}>
               <Settings />
             </IconButton>
           </Box>
         </Box>
       </Box>
+
+      {/* Settings Menu */}
+      <Menu
+        anchorEl={settingsAnchor}
+        open={Boolean(settingsAnchor)}
+        onClose={handleSettingsClose}
+      >
+        <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+        <MenuItem onClick={handleSettingsClose}>Pet Owner Dashboard</MenuItem>
+        <MenuItem onClick={handleLogoutClick}>Log Out</MenuItem>
+      </Menu>
 
       {/* Search Section */}
       <Box display="flex" justifyContent="center" mb={4}>
@@ -215,9 +241,6 @@ const CaregiverDashboard = () => {
             <MenuItem value="Cat">Cat</MenuItem>
             <MenuItem value="Bird">Bird</MenuItem>
             <MenuItem value="Rabbit">Rabbit</MenuItem>
-            <MenuItem value="Small mammals">Small mammals</MenuItem>
-            <MenuItem value="Exotic pet">Exotic pet</MenuItem>
-            <MenuItem value="No preference">No preference</MenuItem>
           </TextField>
           <Button
             variant="contained"
@@ -272,7 +295,7 @@ const CaregiverDashboard = () => {
                 >
                   <Avatar
                     alt="Pet"
-                    src={pet.image?.[0] || ''} // Use pet image if available
+                    src={pet.image?.[0] || ''}
                     sx={{ width: 150, height: 150, marginBottom: '10px' }}
                   />
                   <Typography variant="h6">{pet.name}</Typography>
@@ -292,20 +315,6 @@ const CaregiverDashboard = () => {
                   >
                     View Profile
                   </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleSendMessage(pet.name)}
-                    sx={{
-                      marginTop: '10px',
-                      borderColor: '#6C63FF',
-                      '&:hover': {
-                        borderColor: '#EACFFE',
-                        color: '#000000',
-                      },
-                    }}
-                  >
-                    Send Message
-                  </Button>
                 </Box>
               ))
             ) : (
@@ -315,96 +324,99 @@ const CaregiverDashboard = () => {
         </Box>
       </Box>
 
-      {/* Upcoming Bookings Section */}
-      <Box display="flex" justifyContent="space-between" px={5} mb={4}>
-        <Box flex="1" mr={2}>
-          <Typography variant="h6">Upcoming bookings</Typography>
-          {hardCodedUpcomingBookings.map((booking, index) => (
-            <Box
-              key={index}
-              display="flex"
-              alignItems="center"
-              bgcolor="#FFFFFF"
-              borderRadius="10px"
-              boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)"
-              p={2}
-              mb={2}
-            >
-              <Avatar
-                src={booking.petImage || ''}
-                alt={booking.petName}
-                sx={{ width: 80, height: 80, mr: 2 }}
-              />
-              <Box>
-                <Typography variant="body1">Pet: {booking.petName}</Typography>
-                <Typography variant="body2">Owner: {booking.ownerName}</Typography>
-                <Typography variant="body2">Date: {booking.date}</Typography>
-              </Box>
-              <Button
-                variant="contained"
-                sx={{
-                  marginLeft: 'auto',
-                  backgroundColor: '#6C63FF',
-                  '&:hover': {
-                    backgroundColor: '#EACFFE',
-                    color: '#000000',
-                  },
-                }}
-                onClick={() => handleOpenCalendar(booking)}
-              >
-                Open calendar
-              </Button>
+      {/* Upcoming Bookings */}
+      <Box px={5} mb={4}>
+        <Typography variant="h6" mb={2}>
+          Upcoming Bookings
+        </Typography>
+        {hardCodedUpcomingBookings.map((booking, index) => (
+          <Box
+            key={index}
+            display="flex"
+            alignItems="center"
+            bgcolor="#FFFFFF"
+            borderRadius="10px"
+            boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)"
+            p={2}
+            mb={2}
+          >
+            <Avatar
+              src={booking.petImage}
+              alt={booking.petName}
+              sx={{ width: 80, height: 80, mr: 2 }}
+            />
+            <Box>
+              <Typography>Pet: {booking.petName}</Typography>
+              <Typography>Owner: {booking.ownerName}</Typography>
+              <Typography>Date: {booking.date}</Typography>
             </Box>
-          ))}
-        </Box>
-
-        {/* Recent Reviews Section */}
-        <Box flex="1" ml={2}>
-          <Typography variant="h6">Recent reviews</Typography>
-          {hardCodedRecentReviews.map((review, index) => (
-            <Box
-              key={index}
-              bgcolor="#FFFFFF"
-              borderRadius="10px"
-              boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)"
-              p={2}
-              mb={2}
+            <Button
+              variant="contained"
+              onClick={() => handleViewCalendar(booking)}
+              sx={{
+                marginLeft: 'auto',
+                backgroundColor: '#6C63FF',
+                '&:hover': {
+                  backgroundColor: '#EACFFE',
+                  color: '#000000',
+                },
+              }}
             >
-              <Typography variant="body2">"{review.text}"</Typography>
-              <Typography variant="body2" mt={1}>
-                Owner: {review.ownerName} - Pet: {review.petName}
-              </Typography>
-              <Button
-                variant="outlined"
-                sx={{
-                  marginTop: '10px',
-                  borderColor: '#6C63FF',
-                  '&:hover': {
-                    borderColor: '#EACFFE',
-                    color: '#000000',
-                  },
-                }}
-              >
-                View all reviews
-              </Button>
-            </Box>
-          ))}
-        </Box>
+              View Calendar
+            </Button>
+          </Box>
+        ))}
       </Box>
 
-      {/* Error Message */}
-      {errorMessage && (
-        <Typography
-          color="error"
-          textAlign="center"
-          variant="body2"
-          mt={2}
-        >
-          {errorMessage}
+      {/* Recent Reviews */}
+      <Box px={5} mb={4}>
+        <Typography variant="h6" mb={2}>
+          Recent Reviews
         </Typography>
-      )}
+        {hardCodedRecentReviews.map((review, index) => (
+          <Box
+            key={index}
+            bgcolor="#FFFFFF"
+            borderRadius="10px"
+            boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)"
+            p={2}
+            mb={2}
+          >
+            <Typography>"{review.text}"</Typography>
+            <Typography>
+              Owner: {review.ownerName} - Pet: {review.petName}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
 
-      {/* Send Message Modal */}
+      {/* Profile Modal */}
+      <Modal open={profileOpen} onClose={handleCloseProfile}>
+        <Box
+          position="fixed"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          width="400px"
+          bgcolor="background.paper"
+          p={4}
+          boxShadow={24}
+          borderRadius="10px"
+        >
+          {selectedPet ? (
+            <>
+              <Typography variant="h6" mb={2}>{selectedPet.name}'s Profile</Typography>
+              <Typography variant="body1">Age: {selectedPet.age || 'Unknown'}</Typography>
+              <Typography variant="body1">Breed: {selectedPet.breed || 'Unknown'}</Typography>
+              <Typography variant="body1">Description: {selectedPet.description || 'No description available'}</Typography>
+            </>
+          ) : (
+            <Typography variant="body2">No profile data available.</Typography>
+          )}
+        </Box>
+      </Modal>
+
+      {/* Message Modal */}
       <Modal open={messageOpen} onClose={handleCloseMessage}>
         <Box
           position="fixed"
@@ -441,31 +453,17 @@ const CaregiverDashboard = () => {
         </Box>
       </Modal>
 
-      {/* View Profile Modal */}
-      <Modal open={profileOpen} onClose={handleCloseProfile}>
-        <Box
-          position="fixed"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          width="400px"
-          bgcolor="background.paper"
-          p={4}
-          boxShadow={24}
-          borderRadius="10px"
+      {/* Error Message */}
+      {errorMessage && (
+        <Typography
+          color="error"
+          textAlign="center"
+          variant="body2"
+          mt={2}
         >
-          {selectedPet ? (
-            <>
-              <Typography variant="h6" mb={2}>{selectedPet.name}'s Profile</Typography>
-              <Typography variant="body1">Age: {selectedPet.age || 'Unknown'}</Typography>
-              <Typography variant="body1">Breed: {selectedPet.breed || 'Unknown'}</Typography>
-              <Typography variant="body1">Description: {selectedPet.description || 'No description available'}</Typography>
-            </>
-          ) : (
-            <Typography variant="body2">No profile data available.</Typography>
-          )}
-        </Box>
-      </Modal>
+          {errorMessage}
+        </Typography>
+      )}
     </Box>
   );
 };

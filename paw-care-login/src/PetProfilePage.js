@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -8,37 +8,43 @@ import {
   MenuItem,
   IconButton,
   Menu,
+  CircularProgress,
 } from '@mui/material';
 import {
   Notifications,
   Message,
   CalendarToday,
   Settings,
-  Star,
 } from '@mui/icons-material';
+import axios from 'axios';
 import logo from './assets/logo-no-background.png';
-import { useNavigate } from 'react-router-dom';
 
 function PetProfilePage() {
-  const { id } = useParams();
-  const [selectedPet, setSelectedPet] = useState(null);
-  const [menuAnchor, setMenuAnchor] = useState(null);
-  const [messageOpen, setMessageOpen] = useState(false);
-  const [message, setMessage] = useState('');
+  const { petId } = useParams();
   const navigate = useNavigate();
 
-  const pet = {
-    name: 'Danny',
-    breed: 'Bernese Mountain Dog',
-    gender: 'Male',
-    age: '2 years',
-    owner: 'Christian Brown',
-    location: 'Tampere',
-    rating: 5,
-    description:
-      'Danny is a friendly, playful dog who loves exploring new places and meeting new people...',
-    specialNeeds: 'Dietary restrictions',
-  };
+  const [pet, setPet] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [menuAnchor, setMenuAnchor] = useState(null);
+
+  useEffect(() => {
+    const fetchPet = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/pets/${petId}`
+        );
+        setPet(response.data);
+      } catch (err) {
+        console.error('Error fetching pet profile:', err);
+        setError('Failed to load pet profile. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPet();
+  }, [petId]);
 
   const handleMenuClick = (event) => {
     setMenuAnchor(event.currentTarget);
@@ -52,33 +58,70 @@ function PetProfilePage() {
     navigate('/calendar');
   };
 
-  const handleSendMessage = () => {
-    setMessageOpen(true);
-  };
+  if (loading) {
+    return (
+      <Box
+        style={{
+          backgroundColor: '#f3f3f3',
+          width: '100vw',
+          minHeight: '100vh',
+          overflow: 'auto',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-  const handleCloseMessage = () => {
-    setMessageOpen(false);
-    setMessage('');
-  };
+  if (error) {
+    return (
+      <Box
+        style={{
+          backgroundColor: '#f3f3f3',
+          width: '100vw',
+          minHeight: '100vh',
+          overflow: 'auto',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography color='error'>{error}</Typography>
+      </Box>
+    );
+  }
 
-  const handleSend = () => {
-    console.log(`Message to ${selectedPet.name}: ${message}`);
-    setMessageOpen(false);
-    setMessage('');
-  };
-
-  const fontStyle = { fontFamily: 'Roboto Slab, serif' };
-  const menuItemStyle = {
-    fontFamily: fontStyle.fontFamily,
-    backgroundColor: '#FFFFFF',
-    '&:focus': {
-      backgroundColor: 'transparent',
-    },
-    '&:hover': {
-      transition: 'background-color 0.3s ease',
-      backgroundColor: '#EACFFE',
-    },
-  };
+  if (!pet) {
+    return (
+      <Box
+        style={{
+          backgroundColor: '#f3f3f3',
+          width: '100vw',
+          minHeight: '100vh',
+          overflow: 'auto',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography>No pet found.</Typography>
+      </Box>
+    );
+  }
+  const {
+    name,
+    breed,
+    type,
+    age,
+    gender,
+    attention,
+    characteristic,
+    image,
+    owner,
+  } = pet;
 
   return (
     <Box
@@ -130,24 +173,20 @@ function PetProfilePage() {
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
               <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  navigate('/pet-owner-dashboard');
+                }}
                 sx={{
-                  fontFamily: fontStyle,
                   '&:hover': {
-                    transition: 'background-color 0.3s ease',
                     backgroundColor: '#EACFFE',
                   },
                 }}
-                onClick={() => {
-                  handleMenuClose();
-                  navigate('/edit-profile');
-                }}
               >
-                Edit profile
+                Dashboard
               </MenuItem>
               <MenuItem
                 sx={{
-                  fontFamily: fontStyle,
-                  transition: 'background-color 0.3s ease',
                   '&:hover': {
                     backgroundColor: '#EACFFE',
                   },
@@ -161,8 +200,6 @@ function PetProfilePage() {
               </MenuItem>
               <MenuItem
                 sx={{
-                  fontFamily: fontStyle,
-                  transition: 'background-color 0.3s ease',
                   '&:hover': {
                     backgroundColor: '#EACFFE',
                   },
@@ -176,8 +213,6 @@ function PetProfilePage() {
               </MenuItem>
               <MenuItem
                 sx={{
-                  fontFamily: fontStyle,
-                  transition: 'background-color 0.3s ease',
                   '&:hover': {
                     backgroundColor: '#EACFFE',
                   },
@@ -203,50 +238,53 @@ function PetProfilePage() {
           boxShadow='0px 4px 12px rgba(0, 0, 0, 0.1)'
         >
           <Box display='flex' alignItems='center' gap='20px'>
-            <Avatar
-              alt={pet.name}
-              src='/path/to/pet/image' // Use the actual image source here
-              sx={{ width: 120, height: 120 }}
-            />
+            {image ? (
+              <Avatar alt={name} src={image} sx={{ width: 120, height: 120 }} />
+            ) : (
+              <Avatar sx={{ width: 120, height: 120 }}>{name.charAt(0)}</Avatar>
+            )}
             <Box>
               <Typography variant='h5' fontWeight='bold'>
-                {pet.name}
+                {name}
               </Typography>
-              <Typography variant='subtitle1'>{pet.breed}</Typography>
-              <Typography variant='body2'>Gender: {pet.gender}</Typography>
-              <Typography variant='body2'>Age: {pet.age}</Typography>
+              <Typography variant='subtitle1'>{breed}</Typography>
+              <Typography variant='body2'>Type: {type}</Typography>
+              <Typography variant='body2'>Gender: {gender}</Typography>
+              <Typography variant='body2'>Age: {age}</Typography>
             </Box>
           </Box>
           <Box marginTop='20px'>
-            <Typography variant='h6'>Owner: {pet.owner}</Typography>
-            <Typography variant='body2'>Location: {pet.location}</Typography>
-            <Typography variant='body2' color='textSecondary'>
-              {[...Array(pet.rating)].map((_, index) => (
-                <span key={index}>&#9733;</span>
-              ))}{' '}
-              ({pet.rating} Reviews)
-            </Typography>
+            {owner && (
+              <Typography variant='h6'>
+                Owner: {owner.name || 'No owner name available'}
+              </Typography>
+            )}
+            {/* Add other owner details if available, like location */}
           </Box>
           <Box marginTop='20px'>
-            <Typography variant='body1'>{pet.description}</Typography>
-            <Typography variant='subtitle2' color='primary' marginTop='10px'>
-              Special Needs: {pet.specialNeeds}
-            </Typography>
+            {characteristic && (
+              <Typography variant='body1'>{characteristic}</Typography>
+            )}
+            {attention && (
+              <Typography variant='subtitle2' color='primary' marginTop='10px'>
+                Special Needs: {attention}
+              </Typography>
+            )}
           </Box>
           <Box marginTop='30px' display='flex' gap='20px'>
             <Button
               variant='contained'
               color='primary'
-              onClick={() => console.log('Edit pet profile')}
+              onClick={() => navigate(`/create-pet-profile`)}
             >
               Edit
             </Button>
             <Button
               variant='outlined'
               color='secondary'
-              onClick={() => console.log('Cancel')}
+              onClick={() => navigate('/pet-owner-dashboard')}
             >
-              Cancel
+              Back
             </Button>
           </Box>
         </Box>

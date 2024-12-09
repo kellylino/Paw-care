@@ -30,10 +30,11 @@ function PetProfileForm() {
     if (file) {
       try {
         const options = {
-          maxSizeMB: 1,
+          maxSizeMB: 0.5, 
           maxWidthOrHeight: 500,
           useWebWorker: true,
         };
+
         const compressedFile = await imageCompression(file, options);
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -67,6 +68,7 @@ function PetProfileForm() {
           specialNeeds,
           personality,
           owner: userId,
+          image: petImage, // Add this field
         },
         {
           headers: {

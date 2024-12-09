@@ -16,6 +16,7 @@ import CalendarPage from './CalendarPage';
 import CaregiverDashboard from './caregiver_dashboard';
 import PetProfileForm from './PetProfileForm';
 import PetProfilePage from './PetProfilePage';
+import CaregiverProfilePage from './CaregiverProfilePage';
 import './App.css';
 
 function App() {
@@ -75,7 +76,11 @@ function App() {
           element={<CaregiverDashboard />}
         />{' '}
         <Route path='/create-pet-profile' element={<PetProfileForm />} />
-        <Route path='/pet-profile-page' element={<PetProfilePage />} />
+        <Route path='/pet-profile-page/:petId' element={<PetProfilePage />} />
+        <Route
+          path='/giver-profile-page/:id'
+          element={<CaregiverProfilePage />}
+        />
       </Routes>
     </div>
   );

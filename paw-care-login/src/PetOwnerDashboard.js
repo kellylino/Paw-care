@@ -85,6 +85,12 @@ function PetOwnerDashboard() {
     console.log(`Message to ${selectedPet.name}: ${message}`);
     setMessageOpen(false);
     setMessage('');
+    const handleMenuClose = () => {
+      setMenuAnchor(null);
+    };
+    const handleMenuClick = (event) => {
+      setMenuAnchor(event.currentTarget);
+    };
   };
 
   const fontStyle = { fontFamily: 'Roboto Slab, serif' };
@@ -700,6 +706,33 @@ function PetOwnerDashboard() {
           >
             Send
           </Button>
+        </Box>
+      </Modal>
+      <Modal open={messageOpen} onClose={() => setMessageOpen(false)}>
+        <Box
+          position="absolute"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          bgcolor="background.paper"
+          p={4}
+          borderRadius="10px"
+          boxShadow={24}
+        >
+          <Typography variant="h6">Send a Message</Typography>
+          <TextField
+            label="Message"
+            multiline
+            rows={4}
+            fullWidth
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <Box mt={2}>
+            <Button variant="contained" onClick={handleSend} fullWidth>
+              Send
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </Box>

@@ -31,11 +31,39 @@ const CaregiverDashboard = () => {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [message, setMessage] = useState('');
 
+  const hardCodedUpcomingBookings = [
+    {
+      petImage: 'https://via.placeholder.com/80',
+      petName: 'Lucky',
+      ownerName: 'John Smith',
+      date: '28.12.2024',
+    },
+    {
+      petImage: 'https://via.placeholder.com/80',
+      petName: 'Bella',
+      ownerName: 'Jane Doe',
+      date: '29.12.2024',
+    },
+  ];
+
+  const hardCodedRecentReviews = [
+    {
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      ownerName: 'Kelly White',
+      petName: 'Kai',
+    },
+    {
+      text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
+      ownerName: 'Sam Green',
+      petName: 'Milo',
+    },
+  ];
+
   useEffect(() => {
     const fetchInitialPets = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/pets');
-        setPets(response.data || []); // Populate with all pets initially
+        setPets(response.data || []);
       } catch (error) {
         console.error('Error fetching pets:', error);
         setErrorMessage('Failed to fetch pets. Please try again later.');
@@ -98,6 +126,11 @@ const CaregiverDashboard = () => {
     console.log(`Message to ${selectedRecipient}: ${message}`);
     setMessageOpen(false);
     setMessage('');
+  };
+
+  const handleOpenCalendar = (booking) => {
+    console.log(`Opening calendar for booking on ${booking.date}`);
+    navigate('/calendar', { state: { booking } });
   };
 
   return (
@@ -279,6 +312,83 @@ const CaregiverDashboard = () => {
               <Typography variant="body2">No pets found.</Typography>
             )}
           </Box>
+        </Box>
+      </Box>
+
+      {/* Upcoming Bookings Section */}
+      <Box display="flex" justifyContent="space-between" px={5} mb={4}>
+        <Box flex="1" mr={2}>
+          <Typography variant="h6">Upcoming bookings</Typography>
+          {hardCodedUpcomingBookings.map((booking, index) => (
+            <Box
+              key={index}
+              display="flex"
+              alignItems="center"
+              bgcolor="#FFFFFF"
+              borderRadius="10px"
+              boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)"
+              p={2}
+              mb={2}
+            >
+              <Avatar
+                src={booking.petImage || ''}
+                alt={booking.petName}
+                sx={{ width: 80, height: 80, mr: 2 }}
+              />
+              <Box>
+                <Typography variant="body1">Pet: {booking.petName}</Typography>
+                <Typography variant="body2">Owner: {booking.ownerName}</Typography>
+                <Typography variant="body2">Date: {booking.date}</Typography>
+              </Box>
+              <Button
+                variant="contained"
+                sx={{
+                  marginLeft: 'auto',
+                  backgroundColor: '#6C63FF',
+                  '&:hover': {
+                    backgroundColor: '#EACFFE',
+                    color: '#000000',
+                  },
+                }}
+                onClick={() => handleOpenCalendar(booking)}
+              >
+                Open calendar
+              </Button>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Recent Reviews Section */}
+        <Box flex="1" ml={2}>
+          <Typography variant="h6">Recent reviews</Typography>
+          {hardCodedRecentReviews.map((review, index) => (
+            <Box
+              key={index}
+              bgcolor="#FFFFFF"
+              borderRadius="10px"
+              boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)"
+              p={2}
+              mb={2}
+            >
+              <Typography variant="body2">"{review.text}"</Typography>
+              <Typography variant="body2" mt={1}>
+                Owner: {review.ownerName} - Pet: {review.petName}
+              </Typography>
+              <Button
+                variant="outlined"
+                sx={{
+                  marginTop: '10px',
+                  borderColor: '#6C63FF',
+                  '&:hover': {
+                    borderColor: '#EACFFE',
+                    color: '#000000',
+                  },
+                }}
+              >
+                View all reviews
+              </Button>
+            </Box>
+          ))}
         </Box>
       </Box>
 
